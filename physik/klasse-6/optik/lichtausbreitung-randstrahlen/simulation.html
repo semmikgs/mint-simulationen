@@ -50,9 +50,9 @@
     <strong>physik_kl6_optik_schirmbild.html</strong> (Simulation)<br>
     <strong>physik_kl6_optik_schirmbild_info.html</strong> (Infoseite)
   </div>
-  <label>physik_kl6_optik_schirmbild.html</label>
+  <label>physik_kl6_optik_schirmbild.html <span style="color:#e94560">*</span></label>
   <input type="file" id="file_sim" accept=".html" style="margin-bottom:14px">
-  <label>physik_kl6_optik_schirmbild_info.html</label>
+  <label>physik_kl6_optik_schirmbild_info.html <span style="color:#888">(optional)</span></label>
   <input type="file" id="file_info" accept=".html" style="margin-bottom:14px">
 </div>
 
@@ -61,7 +61,7 @@
   <div class="progress">
     <div class="step" id="step1"><span class="icon">⏳</span><span class="label">1. Verbindung prüfen</span></div>
     <div class="step" id="step2"><span class="icon">⏳</span><span class="label">2. physik_kl6_optik_schirmbild.html hochladen</span></div>
-    <div class="step" id="step3"><span class="icon">⏳</span><span class="label">3. physik_kl6_optik_schirmbild_info.html hochladen</span></div>
+    <div class="step" id="step3"><span class="icon">⏳</span><span class="label">3. physik_kl6_optik_schirmbild_info.html hochladen (optional)</span></div>
     <div class="step" id="step4"><span class="icon">⏳</span><span class="label">4. index.html aktualisieren</span></div>
     <div class="step" id="step5"><span class="icon">⏳</span><span class="label">5. Fertig</span></div>
   </div>
@@ -132,11 +132,15 @@ async function startUpload(){
   }catch(e){log('❌ '+e,'err');setStep(2,'error');btn.disabled=false;return;}
 
   setStep(3,'active');
-  try{
-    const c=await readFile(document.getElementById('file_info'));
-    await uploadFile(token,owner,repo,`${PATH}/${INFO_FILE}`,c,'Add: '+INFO_FILE);
-    log('✅ '+INFO_FILE+' hochgeladen','ok');setStep(3,'done');
-  }catch(e){log('❌ '+e,'err');setStep(3,'error');btn.disabled=false;return;}
+  if(document.getElementById('file_info').files[0]) {
+    try{
+      const c=await readFile(document.getElementById('file_info'));
+      await uploadFile(token,owner,repo,`${PATH}/${INFO_FILE}`,c,'Add: '+INFO_FILE);
+      log('✅ '+INFO_FILE+' hochgeladen','ok');setStep(3,'done');
+    }catch(e){log('❌ '+e,'err');setStep(3,'error');btn.disabled=false;return;}
+  } else {
+    log('ℹ️ Keine Info-Datei ausgewählt – übersprungen','info');setStep(3,'done');
+  }
 
   setStep(4,'active');
   log('Aktualisiere index.html...','info');
