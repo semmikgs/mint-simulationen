@@ -2,967 +2,176 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Ausbreitung des Lichts – Randstrahlen | Physik Klasse 6</title>
-<!--
-  MINT-Simulation: Ausbreitung des Lichts – Randstrahlen
-  Fach: Physik | Klasse: 6 | Oberthema: Optik
-  Typ: Schülerversuch
-  Lernziele:
-    - Lichtbündel aus Randstrahlen verstehen
-    - Wirkung einer Blende auf ein Lichtbündel erkennen
-    - Mehrfachspalt-Effekt beobachten
-  Erstellt: 2025
--->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Upload – Schirmbild an Blenden</title>
 <style>
-  :root {
-    --bg: #1a1a2e;
-    --panel: #16213e;
-    --card: #0f3460;
-    --accent: #e94560;
-    --yellow: #f5c518;
-    --white: #eaeaea;
-    --gray: #888;
-    --radius: 12px;
-    --shadow: 0 4px 20px rgba(0,0,0,0.4);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: var(--bg);
-    color: var(--white);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* ── HEADER ── */
-  header {
-    background: var(--panel);
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 2px solid var(--accent);
-    box-shadow: var(--shadow);
-  }
-  header h1 { font-size: 1.1rem; color: var(--yellow); }
-  header .meta { font-size: 0.75rem; color: var(--gray); }
-
-  /* ── NAV TABS ── */
-  nav {
-    display: flex;
-    background: var(--panel);
-    padding: 0 10px;
-    gap: 4px;
-    overflow-x: auto;
-  }
-  nav button {
-    padding: 10px 14px;
-    background: none;
-    border: none;
-    color: var(--gray);
-    font-size: 0.8rem;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    white-space: nowrap;
-    transition: all 0.2s;
-    touch-action: manipulation;
-  }
-  nav button.active {
-    color: var(--yellow);
-    border-bottom-color: var(--yellow);
-    font-weight: bold;
-  }
-  nav button:hover { color: var(--white); }
-
-  /* ── MAIN ── */
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    gap: 14px;
-    max-width: 900px;
-    width: 100%;
-    margin: 0 auto;
-  }
-
-  .page { display: none; flex-direction: column; gap: 14px; }
-  .page.active { display: flex; }
-
-  /* ── AUFGABENBOX ── */
-  .aufgabe {
-    background: var(--card);
-    border-left: 4px solid var(--yellow);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    font-size: 0.9rem;
-    line-height: 1.5;
-  }
-  .aufgabe strong { color: var(--yellow); }
-
-  /* ── CANVAS WRAPPER ── */
-  .canvas-wrap {
-    background: #000;
-    border-radius: var(--radius);
-    overflow: hidden;
-    position: relative;
-    box-shadow: var(--shadow);
-  }
-  canvas {
-    display: block;
-    width: 100%;
-    height: auto;
-    touch-action: none;
-  }
-
-  /* ── CONTROLS ── */
-  .controls {
-    background: var(--panel);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .ctrl-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .ctrl-label {
-    font-size: 0.8rem;
-    color: var(--gray);
-    min-width: 160px;
-  }
-  .ctrl-label span {
-    color: var(--yellow);
-    font-weight: bold;
-    font-size: 0.95rem;
-  }
-  input[type=range] {
-    -webkit-appearance: none;
-    flex: 1;
-    min-width: 120px;
-    height: 6px;
-    background: var(--card);
-    border-radius: 4px;
-    outline: none;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: var(--yellow);
-    cursor: pointer;
-    box-shadow: 0 0 6px rgba(245,197,24,0.6);
-  }
-  .toggle-btn {
-    padding: 8px 18px;
-    border: 2px solid var(--yellow);
-    background: none;
-    color: var(--yellow);
-    border-radius: 8px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    touch-action: manipulation;
-  }
-  .toggle-btn.on { background: var(--yellow); color: #000; }
-
-  /* ── REFLEXIONSFRAGEN ── */
-  .fragen {
-    background: var(--panel);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-  }
-  .fragen h3 { color: var(--accent); margin-bottom: 8px; font-size: 0.9rem; }
-  .fragen ol { padding-left: 18px; font-size: 0.85rem; line-height: 1.8; color: var(--white); }
-
-  /* ── LEGENDE ── */
-  .legend {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    font-size: 0.78rem; color: var(--gray);
-  }
-  .legend span { display: flex; align-items: center; gap: 6px; }
-  .legend .dot { width: 12px; height: 12px; border-radius: 2px; }
-
-  footer {
-    text-align: center;
-    padding: 10px;
-    font-size: 0.72rem;
-    color: var(--gray);
-    border-top: 1px solid var(--card);
-  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;color:#1a1a2e;padding:24px;}
+  h1{font-size:1.3rem;margin-bottom:6px;}
+  .sub{color:#666;font-size:0.85rem;margin-bottom:24px;}
+  .card{background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:16px;}
+  .card h2{font-size:1rem;margin-bottom:14px;color:#e94560;}
+  label{font-size:0.85rem;font-weight:600;display:block;margin-bottom:4px;color:#444;}
+  input[type=text],input[type=password]{width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:0.9rem;margin-bottom:14px;outline:none;}
+  input:focus{border-color:#1a73e8;}
+  .btn{padding:12px 24px;border-radius:8px;border:none;cursor:pointer;font-size:0.9rem;font-weight:600;width:100%;transition:all .2s;}
+  .btn-primary{background:#1a73e8;color:#fff;}
+  .btn-primary:disabled{background:#aaa;cursor:not-allowed;}
+  .log{background:#1a1a2e;color:#eee;border-radius:8px;padding:14px;font-family:monospace;font-size:0.82rem;min-height:100px;max-height:300px;overflow-y:auto;white-space:pre-wrap;margin-top:8px;}
+  .log .ok{color:#4caf50;} .log .err{color:#f44336;} .log .info{color:#90caf9;}
+  .progress{display:flex;flex-direction:column;gap:8px;margin:12px 0;}
+  .step{display:flex;align-items:center;gap:10px;font-size:0.85rem;}
+  .step .icon{font-size:1.1rem;width:24px;text-align:center;}
+  .step.done .label{color:#4caf50;font-weight:600;}
+  .step.active .label{color:#1a73e8;font-weight:600;}
+  .step.error .label{color:#f44336;}
+  .hint{font-size:0.78rem;color:#888;margin-top:-10px;margin-bottom:14px;}
+  .file-info{background:#f0f4f8;border-radius:8px;padding:10px 14px;font-size:0.82rem;color:#444;margin-bottom:14px;}
 </style>
 </head>
 <body>
+<h1>🚀 GitHub Upload – Schirmbild an Blenden</h1>
+<p class="sub">Lädt physik_kl6_optik_schirmbild.html + info.html hoch und aktualisiert index.html</p>
 
-<header>
-  <div>
-    <h1>🔦 Ausbreitung des Lichts – Randstrahlen</h1>
-    <div class="meta">Physik · Klasse 6 · Optik · Schülerversuch</div>
+<div class="card">
+  <h2>🔑 GitHub Zugangsdaten</h2>
+  <label>GitHub Username</label>
+  <input type="text" id="owner" value="semmikgs">
+  <label>Repository-Name</label>
+  <input type="text" id="repo" value="mint-simulationen">
+  <label>Personal Access Token (PAT)</label>
+  <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+  <p class="hint">Token: github.com → Settings → Developer settings → Tokens (classic) → Scope: repo</p>
+</div>
+
+<div class="card">
+  <h2>📁 Dateien auswählen</h2>
+  <div class="file-info">Erwartete Dateinamen:<br>
+    <strong>physik_kl6_optik_schirmbild.html</strong> (Simulation)<br>
+    <strong>physik_kl6_optik_schirmbild_info.html</strong> (Infoseite)
   </div>
-</header>
+  <label>physik_kl6_optik_schirmbild.html</label>
+  <input type="file" id="file_sim" accept=".html" style="margin-bottom:14px">
+  <label>physik_kl6_optik_schirmbild_info.html</label>
+  <input type="file" id="file_info" accept=".html" style="margin-bottom:14px">
+</div>
 
-<nav>
-  <button class="active" onclick="showPage(0)">1 · Lichtbündel</button>
-  <button onclick="showPage(1)">2 · Blende (1 Spalt)</button>
-  <button onclick="showPage(2)">3 · Lampe versetzt</button>
-  <button onclick="showPage(3)">4 · Mehrfachspalt</button>
-</nav>
-
-<main>
-
-  <!-- ══════════════════════════════════════
-       SEITE 1: Lichtbündel & Randstrahlen
-  ══════════════════════════════════════ -->
-  <div class="page active" id="page0">
-
-    <div class="aufgabe">
-      <strong>Aufgabe:</strong> Beobachte das Lichtbündel der Taschenlampe.<br>
-      Schiebe den Regler, um die <strong>Öffnungsbreite</strong> zu verändern.<br>
-      Schalte die Randstrahlen ein und aus – was fällt dir auf?
-    </div>
-
-    <div class="canvas-wrap">
-      <canvas id="c1" width="800" height="380"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl-row">
-        <div class="ctrl-label">Öffnungswinkel: <span id="v1_winkel">30</span>°</div>
-        <input type="range" id="s1_winkel" min="5" max="60" value="30" oninput="draw1()">
-      </div>
-      <div class="ctrl-row">
-        <div class="ctrl-label">Strahlenanzahl: <span id="v1_n">8</span></div>
-        <input type="range" id="s1_n" min="2" max="20" value="8" oninput="draw1()">
-      </div>
-      <div class="ctrl-row">
-        <button class="toggle-btn on" id="btn1_rand" onclick="toggle('rand1');draw1()">Randstrahlen: AN</button>
-        <button class="toggle-btn on" id="btn1_all" onclick="toggle('all1');draw1()">Alle Strahlen: AN</button>
-      </div>
-    </div>
-
-    <div class="legend">
-      <span><div class="dot" style="background:#f5c518"></div> Alle Lichtstrahlen</span>
-      <span><div class="dot" style="background:#ff4444"></div> Randstrahlen</span>
-    </div>
-
-    <div class="fragen">
-      <h3>🤔 Fragen zum Nachdenken</h3>
-      <ol>
-        <li>Was ist der Unterschied zwischen einem Lichtbündel und einem Lichtstrahl?</li>
-        <li>Welche Strahlen nennt man Randstrahlen?</li>
-        <li>Was passiert mit dem Lichtbündel, wenn der Winkel größer wird?</li>
-      </ol>
-    </div>
+<div class="card">
+  <h2>📤 Upload starten</h2>
+  <div class="progress">
+    <div class="step" id="step1"><span class="icon">⏳</span><span class="label">1. Verbindung prüfen</span></div>
+    <div class="step" id="step2"><span class="icon">⏳</span><span class="label">2. physik_kl6_optik_schirmbild.html hochladen</span></div>
+    <div class="step" id="step3"><span class="icon">⏳</span><span class="label">3. physik_kl6_optik_schirmbild_info.html hochladen</span></div>
+    <div class="step" id="step4"><span class="icon">⏳</span><span class="label">4. index.html aktualisieren</span></div>
+    <div class="step" id="step5"><span class="icon">⏳</span><span class="label">5. Fertig</span></div>
   </div>
-
-  <!-- ══════════════════════════════════════
-       SEITE 2: Licht an einer Blende (1 Spalt)
-  ══════════════════════════════════════ -->
-  <div class="page" id="page1">
-
-    <div class="aufgabe">
-      <strong>Aufgabe:</strong> Eine Blende lässt nur einen schmalen Lichtspalt durch.<br>
-      Verändere die <strong>Spaltbreite</strong> und die <strong>Spaltposition</strong>.<br>
-      Beobachte, wie die Randstrahlen durch den Spalt verlaufen.
-    </div>
-
-    <div class="canvas-wrap">
-      <canvas id="c2" width="800" height="380"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl-row">
-        <div class="ctrl-label">Spaltbreite: <span id="v2_spalt">40</span> px</div>
-        <input type="range" id="s2_spalt" min="5" max="120" value="40" oninput="draw2()">
-      </div>
-      <div class="ctrl-row">
-        <div class="ctrl-label">Spaltposition: <span id="v2_pos">0</span></div>
-        <input type="range" id="s2_pos" min="-120" max="120" value="0" oninput="draw2()">
-      </div>
-      <div class="ctrl-row">
-        <button class="toggle-btn on" id="btn2_rand" onclick="toggle('rand2');draw2()">Randstrahlen: AN</button>
-        <button class="toggle-btn" id="btn2_hint" onclick="toggle('hint2');draw2()">Erklärung: AUS</button>
-      </div>
-    </div>
-
-    <div class="legend">
-      <span><div class="dot" style="background:#333a55"></div> Blende (undurchsichtig)</span>
-      <span><div class="dot" style="background:#f5c518"></div> Lichtbündel</span>
-      <span><div class="dot" style="background:#ff4444"></div> Randstrahlen</span>
-    </div>
-
-    <div class="fragen">
-      <h3>🤔 Fragen zum Nachdenken</h3>
-      <ol>
-        <li>Was macht eine Blende mit dem Lichtbündel?</li>
-        <li>Was passiert mit den Randstrahlen, wenn der Spalt sehr schmal ist?</li>
-        <li>Woher kommen die neuen Randstrahlen nach der Blende?</li>
-      </ol>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       SEITE 3: Lampe versetzt (off-center)
-  ══════════════════════════════════════ -->
-  <div class="page" id="page2">
-
-    <div class="aufgabe">
-      <strong>Aufgabe:</strong> Die Lampe steht jetzt <strong>nicht mehr in der Mitte</strong>.<br>
-      Verschiebe Lampe und Blende. Wie verändert sich der Strahlengang?<br>
-      Was passiert, wenn die Lampe sehr weit oben oder unten steht?
-    </div>
-
-    <div class="canvas-wrap">
-      <canvas id="c3" width="800" height="380"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl-row">
-        <div class="ctrl-label">Lampe (oben/unten): <span id="v3_lamp">0</span></div>
-        <input type="range" id="s3_lamp" min="-130" max="130" value="0" oninput="draw3()">
-      </div>
-      <div class="ctrl-row">
-        <div class="ctrl-label">Spaltbreite: <span id="v3_spalt">50</span> px</div>
-        <input type="range" id="s3_spalt" min="5" max="120" value="50" oninput="draw3()">
-      </div>
-      <div class="ctrl-row">
-        <div class="ctrl-label">Spaltposition: <span id="v3_pos">0</span></div>
-        <input type="range" id="s3_pos" min="-120" max="120" value="0" oninput="draw3()">
-      </div>
-      <div class="ctrl-row">
-        <button class="toggle-btn on" id="btn3_rand" onclick="toggle('rand3');draw3()">Randstrahlen: AN</button>
-      </div>
-    </div>
-
-    <div class="fragen">
-      <h3>🤔 Fragen zum Nachdenken</h3>
-      <ol>
-        <li>Was verändert sich am Lichtbündel, wenn die Lampe versetzt ist?</li>
-        <li>Was passiert, wenn Lampe und Spalt sehr weit voneinander entfernt sind?</li>
-        <li>Tritt noch Licht durch die Blende? Begründe deine Antwort.</li>
-      </ol>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════
-       SEITE 4: Mehrfachspaltblende
-  ══════════════════════════════════════ -->
-  <div class="page" id="page3">
-
-    <div class="aufgabe">
-      <strong>Aufgabe:</strong> Diese Blende hat <strong>mehrere Spalte</strong>.<br>
-      Ändere die Anzahl der Spalte und ihre Breite.<br>
-      Was siehst du auf der rechten Seite der Blende?
-    </div>
-
-    <div class="canvas-wrap">
-      <canvas id="c4" width="800" height="380"></canvas>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl-row">
-        <div class="ctrl-label">Anzahl Spalte: <span id="v4_n">3</span></div>
-        <input type="range" id="s4_n" min="1" max="6" value="3" oninput="draw4()">
-      </div>
-      <div class="ctrl-row">
-        <div class="ctrl-label">Spaltbreite: <span id="v4_br">25</span> px</div>
-        <input type="range" id="s4_br" min="5" max="55" value="25" oninput="draw4()">
-      </div>
-      <div class="ctrl-row">
-        <div class="ctrl-label">Öffnungswinkel Lampe: <span id="v4_winkel">35</span>°</div>
-        <input type="range" id="s4_winkel" min="10" max="70" value="35" oninput="draw4()">
-      </div>
-      <div class="ctrl-row">
-        <button class="toggle-btn on" id="btn4_rand" onclick="toggle('rand4');draw4()">Randstrahlen: AN</button>
-        <button class="toggle-btn on" id="btn4_fill" onclick="toggle('fill4');draw4()">Lichtfüllung: AN</button>
-      </div>
-    </div>
-
-    <div class="legend">
-      <span><div class="dot" style="background:#f5c518;opacity:.4"></div> Lichtfüllung</span>
-      <span><div class="dot" style="background:#ff4444"></div> Randstrahlen</span>
-    </div>
-
-    <div class="fragen">
-      <h3>🤔 Fragen zum Nachdenken</h3>
-      <ol>
-        <li>Wie viele Lichtbündel entstehen hinter einer Mehrfachblende?</li>
-        <li>Was haben alle Teilbündel gemeinsam?</li>
-        <li>Wo kommen die Randstrahlen der einzelnen Bündel her?</li>
-      </ol>
-    </div>
-  </div>
-
-</main>
-
-<footer>Physik · Klasse 6 · Optik – Ausbreitung des Lichts · Schülerversuch</footer>
+  <button class="btn btn-primary" id="uploadBtn" onclick="startUpload()">⬆️ Jetzt hochladen</button>
+  <div class="log" id="log">Bereit.</div>
+</div>
 
 <script>
-// ── State ──────────────────────────────────────────────────────────────────
-const state = {
-  rand1: true, all1: true,
-  rand2: true, hint2: false,
-  rand3: true,
-  rand4: true, fill4: true
-};
+const PATH = 'physik/klasse-6/optik/schirmbild-blenden';
+const SIM_FILE  = 'physik_kl6_optik_schirmbild.html';
+const INFO_FILE = 'physik_kl6_optik_schirmbild_info.html';
 
-function toggle(key) {
-  state[key] = !state[key];
-  const id = 'btn' + key.replace(/([a-z])(\d)/,'$1$2_').split('_').map((p,i)=>i===0?p:p).join('_');
-  // find button by data convention
-  document.querySelectorAll('.toggle-btn').forEach(b => {
-    if(b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+key+"'")) {
-      const label = b.textContent.split(':')[0];
-      b.textContent = label + ': ' + (state[key] ? 'AN' : 'AUS');
-      b.classList.toggle('on', state[key]);
-    }
-  });
+function log(msg,type=''){const el=document.getElementById('log');el.innerHTML+=`<span class="${type}">${msg}</span>\n`;el.scrollTop=el.scrollHeight;}
+function setStep(n,s){const el=document.getElementById('step'+n);el.className='step '+s;const icons={done:'✅',active:'🔄',error:'❌'};el.querySelector('.icon').textContent=icons[s]||'⏳';}
+async function readFile(input){return new Promise((res,rej)=>{if(!input.files[0]){rej('Keine Datei');return;}const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej('Lesefehler');r.readAsText(input.files[0]);});}
+
+async function uploadFile(token,owner,repo,filePath,content,message){
+  const apiUrl=`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+  let sha=null;
+  try{const c=await fetch(apiUrl,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}});if(c.ok){const ex=await c.json();sha=ex.sha;}}catch(e){}
+  const body={message,content:btoa(unescape(encodeURIComponent(content))),...(sha&&{sha})};
+  const res=await fetch(apiUrl,{method:'PUT',headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!res.ok){const err=await res.json();throw new Error(err.message||res.status);}
+  return await res.json();
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-function val(id) { return parseFloat(document.getElementById(id).value); }
-function setLabel(id, v) { document.getElementById(id).textContent = v; }
-
-function drawLamp(ctx, x, y, size=28) {
-  // Lampenfassung symbol
-  ctx.save();
-  ctx.strokeStyle = '#ccc';
-  ctx.lineWidth = 2.5;
-  // box
-  ctx.beginPath();
-  ctx.rect(x - size*0.7, y - size*0.7, size*1.4, size*1.4);
-  ctx.stroke();
-  // circle with X
-  ctx.beginPath();
-  ctx.arc(x, y, size*0.45, 0, Math.PI*2);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(x - size*0.32, y - size*0.32);
-  ctx.lineTo(x + size*0.32, y + size*0.32);
-  ctx.moveTo(x + size*0.32, y - size*0.32);
-  ctx.lineTo(x - size*0.32, y + size*0.32);
-  ctx.stroke();
-  ctx.restore();
+function buildIndexEntry(){
+  return `
+    <div class="sim-card" data-fach="physik" data-klasse="klasse-6" data-tags="optik schirmbild blende randstrahlen mehrfachspalt">
+      <div class="sim-icon">🖥️</div>
+      <div class="sim-body">
+        <h3>Schirmbild an Blenden</h3>
+        <div class="sim-meta">Physik · Klasse 6 · Optik · Schülerversuch</div>
+        <div class="sim-tags">
+          <span class="tag">Optik</span><span class="tag">Schirmbild</span>
+          <span class="tag">Mehrfachspalt</span><span class="tag">Randstrahlen</span><span class="tag">Klasse 6</span>
+        </div>
+        <div class="sim-links">
+          <a href="${PATH}/${SIM_FILE}" class="btn-sim">▶ Simulation</a>
+          <a href="${PATH}/${INFO_FILE}" class="btn-info">ℹ️ Info</a>
+        </div>
+      </div>
+    </div>`;
 }
 
-function drawBlende(ctx, bx, cy, gap, posY, cHeight) {
-  // gap = Spaltbreite, posY = Versatz des Spalts
-  const top = cy + posY - gap/2;
-  const bot = cy + posY + gap/2;
-  ctx.save();
-  ctx.fillStyle = '#2a2a4a';
-  ctx.strokeStyle = '#555';
-  ctx.lineWidth = 1;
-  // obere Hälfte
-  if(top > 0) {
-    ctx.fillRect(bx-5, 0, 10, top);
-    ctx.strokeRect(bx-5, 0, 10, top);
-  }
-  // untere Hälfte
-  if(bot < cHeight) {
-    ctx.fillRect(bx-5, bot, 10, cHeight - bot);
-    ctx.strokeRect(bx-5, bot, 10, cHeight - bot);
-  }
-  // gap highlight
-  ctx.strokeStyle = '#f5c518';
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([3,3]);
-  ctx.beginPath();
-  ctx.moveTo(bx, top);
-  ctx.lineTo(bx, bot);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
+async function startUpload(){
+  const btn=document.getElementById('uploadBtn');
+  btn.disabled=true;
+  document.getElementById('log').innerHTML='';
+  const owner=document.getElementById('owner').value.trim();
+  const repo=document.getElementById('repo').value.trim();
+  const token=document.getElementById('token').value.trim();
+  if(!token){log('❌ Kein Token!','err');btn.disabled=false;return;}
+
+  setStep(1,'active');
+  log('Prüfe Verbindung...','info');
+  try{
+    const res=await fetch(`https://api.github.com/repos/${owner}/${repo}`,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}});
+    if(!res.ok)throw new Error('Repo nicht gefunden ('+res.status+')');
+    const d=await res.json();log('✅ '+d.full_name,'ok');setStep(1,'done');
+  }catch(e){log('❌ '+e.message,'err');setStep(1,'error');btn.disabled=false;return;}
+
+  setStep(2,'active');
+  try{
+    const c=await readFile(document.getElementById('file_sim'));
+    await uploadFile(token,owner,repo,`${PATH}/${SIM_FILE}`,c,'Add: '+SIM_FILE);
+    log('✅ '+SIM_FILE+' hochgeladen','ok');setStep(2,'done');
+  }catch(e){log('❌ '+e,'err');setStep(2,'error');btn.disabled=false;return;}
+
+  setStep(3,'active');
+  try{
+    const c=await readFile(document.getElementById('file_info'));
+    await uploadFile(token,owner,repo,`${PATH}/${INFO_FILE}`,c,'Add: '+INFO_FILE);
+    log('✅ '+INFO_FILE+' hochgeladen','ok');setStep(3,'done');
+  }catch(e){log('❌ '+e,'err');setStep(3,'error');btn.disabled=false;return;}
+
+  setStep(4,'active');
+  log('Aktualisiere index.html...','info');
+  try{
+    const apiUrl=`https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
+    let existing=null,sha=null;
+    try{const r=await fetch(apiUrl,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}});if(r.ok){const d=await r.json();sha=d.sha;existing=atob(d.content.replace(/\n/g,''));}}catch(e){}
+    const entry=buildIndexEntry();
+    let newIndex;
+    if(existing&&existing.includes('id="cards"')){
+      newIndex=existing.replace('</main>',entry+'\n</main>');
+    } else {
+      newIndex=buildFallbackIndex(entry);
+    }
+    await uploadFile(token,owner,repo,'index.html',newIndex,'Update: index.html – Schirmbild');
+    log('✅ index.html aktualisiert','ok');setStep(4,'done');
+  }catch(e){log('❌ '+e,'err');setStep(4,'error');btn.disabled=false;return;}
+
+  setStep(5,'done');
+  const url=`https://${owner}.github.io/${repo}/${PATH}/${SIM_FILE}`;
+  log('\n🎉 Fertig! URL (aktiv in ~1–2 Min):\n'+url,'ok');
+  btn.textContent='✅ Erfolgreich hochgeladen';
 }
 
-// ── SEITE 1: Lichtbündel ──────────────────────────────────────────────────
-function draw1() {
-  const canvas = document.getElementById('c1');
-  const W = canvas.width, H = canvas.height;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,W,H);
-
-  const winkel = val('s1_winkel');
-  const n = Math.round(val('s1_n'));
-  setLabel('v1_winkel', winkel);
-  setLabel('v1_n', n);
-
-  const lx = 80, ly = H/2;
-  const rad = winkel * Math.PI / 180;
-
-  // Background gradient
-  ctx.fillStyle = '#050510';
-  ctx.fillRect(0,0,W,H);
-
-  // All rays
-  if(state.all1) {
-    for(let i=0; i<n; i++) {
-      const t = n===1 ? 0 : (i/(n-1) - 0.5);
-      const angle = t * rad;
-      const ex = W - 20;
-      const ey = ly + Math.tan(angle) * (ex - lx);
-      ctx.save();
-      ctx.strokeStyle = 'rgba(245,197,24,0.35)';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(lx, ly);
-      ctx.lineTo(ex, ey);
-      ctx.stroke();
-      ctx.restore();
-    }
-  }
-
-  // Filled bundle area
-  const topAngle = -rad/2, botAngle = rad/2;
-  const ex = W - 20;
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(lx, ly);
-  ctx.lineTo(ex, ly + Math.tan(topAngle)*(ex-lx));
-  ctx.lineTo(ex, ly + Math.tan(botAngle)*(ex-lx));
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(245,197,24,0.07)';
-  ctx.fill();
-  ctx.restore();
-
-  // Randstrahlen
-  if(state.rand1) {
-    [topAngle, botAngle].forEach(a => {
-      const ey2 = ly + Math.tan(a) * (ex - lx);
-      ctx.save();
-      ctx.strokeStyle = '#ff4444';
-      ctx.lineWidth = 2.5;
-      ctx.shadowColor = '#ff4444';
-      ctx.shadowBlur = 8;
-      ctx.beginPath();
-      ctx.moveTo(lx, ly);
-      ctx.lineTo(ex, ey2);
-      ctx.stroke();
-      ctx.restore();
-    });
-
-    // Labels
-    ctx.fillStyle = '#ff4444';
-    ctx.font = 'bold 13px Arial';
-    ctx.fillText('Randstrahl', ex - 120, ly + Math.tan(topAngle)*(ex-lx) - 8);
-    ctx.fillText('Randstrahl', ex - 120, ly + Math.tan(botAngle)*(ex-lx) + 18);
-  }
-
-  // Label "Lichtbündel"
-  ctx.fillStyle = 'rgba(245,197,24,0.8)';
-  ctx.font = '13px Arial';
-  ctx.fillText('Lichtbündel', lx + (ex-lx)*0.45, ly - Math.tan(rad/2)*(ex-lx)*0.5 - 12);
-
-  drawLamp(ctx, lx, ly);
+function buildFallbackIndex(entry){
+  return`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>MINT-Simulationen</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;color:#1a1a2e;}header{background:#1a1a2e;color:#fff;padding:20px 28px;border-bottom:4px solid #f5c518;}header h1{font-size:1.4rem;}header p{font-size:.82rem;color:#aaa;margin-top:4px;}.search-bar{max-width:900px;margin:20px auto 0;padding:0 20px;}.search-bar input{width:100%;padding:12px 16px;border:1.5px solid #ddd;border-radius:10px;font-size:.95rem;outline:none;}main{max-width:900px;margin:16px auto;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}.sim-card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;gap:14px;}.sim-icon{font-size:2rem;flex-shrink:0;}.sim-body h3{font-size:.95rem;margin-bottom:4px;}.sim-meta{font-size:.75rem;color:#888;margin-bottom:8px;}.sim-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;}.tag{background:#e8f4fd;color:#1a73e8;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:600;}.sim-links{display:flex;gap:8px;}.btn-sim,.btn-info{padding:6px 12px;border-radius:6px;text-decoration:none;font-size:.8rem;font-weight:600;}.btn-sim{background:#1a73e8;color:#fff;}.btn-info{background:#f0f4f8;color:#444;border:1px solid #ddd;}footer{text-align:center;padding:20px;font-size:.75rem;color:#888;}</style>
+</head><body>
+<header><h1>🧪 MINT-Simulationen</h1><p>Interaktive Schülerversuche für iPad und ActiveBoard</p></header>
+<div class="search-bar"><input type="text" placeholder="Suchen..." id="search" oninput="filterCards()"></div>
+<main id="cards">${entry}</main>
+<footer>mint-simulationen · semmikgs.github.io</footer>
+<script>function filterCards(){const q=document.getElementById('search').value.toLowerCase();document.querySelectorAll('.sim-card').forEach(c=>{const t=c.textContent.toLowerCase()+c.dataset.tags;c.style.display=t.includes(q)?'':'none';});}<\/script>
+</body></html>`;
 }
-
-// ── SEITE 2: Blende (1 Spalt) ─────────────────────────────────────────────
-function draw2() {
-  const canvas = document.getElementById('c2');
-  const W = canvas.width, H = canvas.height;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,W,H);
-
-  const spalt = val('s2_spalt');
-  const posY = val('s2_pos');
-  setLabel('v2_spalt', spalt);
-  setLabel('v2_pos', posY > 0 ? '+'+posY : posY);
-
-  const lx = 80, ly = H/2;
-  const bx = W * 0.42;
-  const cy = H/2;
-
-  ctx.fillStyle = '#050510';
-  ctx.fillRect(0,0,W,H);
-
-  // Compute which rays pass through slit
-  const halfAngle = 35 * Math.PI / 180;
-  const topRay_y_at_bx = ly + Math.tan(-halfAngle) * (bx - lx);
-  const botRay_y_at_bx = ly + Math.tan(halfAngle) * (bx - lx);
-
-  const slitTop = cy + posY - spalt/2;
-  const slitBot = cy + posY + spalt/2;
-
-  // Clip passing rays
-  const passTop = Math.max(topRay_y_at_bx, slitTop);
-  const passBot = Math.min(botRay_y_at_bx, slitBot);
-
-  const passes = passBot > passTop;
-
-  // Rays from lamp to blende
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(lx, ly);
-  ctx.lineTo(bx, topRay_y_at_bx);
-  ctx.lineTo(bx, botRay_y_at_bx);
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(245,197,24,0.06)';
-  ctx.fill();
-  ctx.restore();
-
-  [topRay_y_at_bx, botRay_y_at_bx].forEach(ey => {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(245,197,24,0.4)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(lx, ly);
-    ctx.lineTo(bx, ey);
-    ctx.stroke();
-    ctx.restore();
-  });
-
-  // Rays after blende: direction = from lamp (lx,ly) through slit edge, continued
-  if(passes) {
-    const ex = W - 20;
-
-    // Direction of each boundary ray: from lamp through slit edge
-    // Upper boundary: lamp → passTop at bx → continue
-    const angTop = Math.atan2(passTop - ly, bx - lx);
-    const angBot = Math.atan2(passBot - ly, bx - lx);
-    const eyTop = passTop + Math.tan(angTop) * (ex - bx);
-    const eyBot = passBot + Math.tan(angBot) * (ex - bx);
-
-    // Fill cone
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(bx, passTop);
-    ctx.lineTo(ex, eyTop);
-    ctx.lineTo(ex, eyBot);
-    ctx.lineTo(bx, passBot);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(245,197,24,0.08)';
-    ctx.fill();
-    ctx.restore();
-
-    // Randstrahlen after blende
-    if(state.rand2) {
-      [[passTop, eyTop],[passBot, eyBot]].forEach(([sy, ey]) => {
-        ctx.save();
-        ctx.strokeStyle = '#ff4444';
-        ctx.lineWidth = 2.5;
-        ctx.shadowColor = '#ff4444';
-        ctx.shadowBlur = 8;
-        ctx.beginPath();
-        ctx.moveTo(bx, sy);
-        ctx.lineTo(ex, ey);
-        ctx.stroke();
-        ctx.restore();
-      });
-
-      // Label
-      ctx.fillStyle = '#ff4444';
-      ctx.font = 'bold 12px Arial';
-      ctx.fillText('Randstrahlen', bx + 20, passTop - 8);
-    }
-
-    // Hint
-    if(state.hint2) {
-      ctx.save();
-      ctx.fillStyle = 'rgba(255,255,255,0.08)';
-      ctx.beginPath();
-      ctx.roundRect(bx+10, cy-40, 200, 55, 8);
-      ctx.fill();
-      ctx.fillStyle = '#eee';
-      ctx.font = '12px Arial';
-      ctx.fillText('Die Spaltränder werden zu', bx+18, cy-22);
-      ctx.fillText('neuen Randstrahlen!', bx+18, cy-4);
-      ctx.restore();
-    }
-  } else {
-    // No light passes
-    ctx.fillStyle = 'rgba(255,100,100,0.7)';
-    ctx.font = 'bold 14px Arial';
-    ctx.fillText('⛔ Kein Licht passiert die Blende', bx+20, cy);
-  }
-
-  drawBlende(ctx, bx, cy, spalt, posY, H);
-  drawLamp(ctx, lx, ly);
-
-  // Label Blende
-  ctx.fillStyle = '#aaa';
-  ctx.font = '13px Arial';
-  ctx.fillText('Blende', bx - 18, H - 12);
-}
-
-// ── SEITE 3: Lampe versetzt ────────────────────────────────────────────────
-function draw3() {
-  const canvas = document.getElementById('c3');
-  const W = canvas.width, H = canvas.height;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,W,H);
-
-  const lampOff = val('s3_lamp');
-  const spalt = val('s3_spalt');
-  const posY = val('s3_pos');
-  setLabel('v3_lamp', lampOff > 0 ? '+'+lampOff : lampOff);
-  setLabel('v3_spalt', spalt);
-  setLabel('v3_pos', posY > 0 ? '+'+posY : posY);
-
-  ctx.fillStyle = '#050510';
-  ctx.fillRect(0,0,W,H);
-
-  const lx = 80, ly = H/2 + lampOff;
-  const bx = W * 0.42;
-  const cy = H/2;
-
-  const halfAngle = 40 * Math.PI / 180;
-  const slitTop = cy + posY - spalt/2;
-  const slitBot = cy + posY + spalt/2;
-
-  // Draw lamp rays (full bundle)
-  const topAngle = -halfAngle, botAngle = halfAngle;
-  const topY_bx = ly + Math.tan(topAngle) * (bx - lx);
-  const botY_bx = ly + Math.tan(botAngle) * (bx - lx);
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(lx, ly);
-  ctx.lineTo(bx, topY_bx);
-  ctx.lineTo(bx, botY_bx);
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(245,197,24,0.05)';
-  ctx.fill();
-  ctx.restore();
-
-  [topY_bx, botY_bx].forEach(ey => {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(245,197,24,0.35)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(bx, ey); ctx.stroke();
-    ctx.restore();
-  });
-
-  // Clipped pass: which part of the bundle actually passes through the slit
-  const passTop = Math.max(Math.min(topY_bx, botY_bx), slitTop);
-  const passBot = Math.min(Math.max(topY_bx, botY_bx), slitBot);
-  const passes = passBot > passTop;
-
-  if(passes) {
-    const ex = W - 20;
-
-    // Direction of Randstrahlen = lamp → slit edge → continue (no angle change!)
-    const angTop = Math.atan2(passTop - ly, bx - lx);
-    const angBot = Math.atan2(passBot - ly, bx - lx);
-    const eyTop = passTop + Math.tan(angTop) * (ex - bx);
-    const eyBot = passBot + Math.tan(angBot) * (ex - bx);
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(bx, passTop);
-    ctx.lineTo(ex, eyTop);
-    ctx.lineTo(ex, eyBot);
-    ctx.lineTo(bx, passBot);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(245,197,24,0.09)';
-    ctx.fill();
-    ctx.restore();
-
-    if(state.rand3) {
-      [[passTop, eyTop],[passBot, eyBot]].forEach(([sy, ey]) => {
-        ctx.save();
-        ctx.strokeStyle = '#ff4444';
-        ctx.lineWidth = 2.5;
-        ctx.shadowColor = '#ff4444'; ctx.shadowBlur = 8;
-        ctx.beginPath(); ctx.moveTo(bx,sy); ctx.lineTo(ex,ey); ctx.stroke();
-        ctx.restore();
-      });
-      ctx.fillStyle = '#ff4444';
-      ctx.font = 'bold 12px Arial';
-      ctx.fillText('Randstrahlen', bx+15, passTop-8);
-    }
-  } else {
-    ctx.fillStyle = 'rgba(255,100,100,0.7)';
-    ctx.font = 'bold 14px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('⛔ Kein Licht durch die Blende', bx+150, cy);
-    ctx.textAlign = 'left';
-  }
-
-  drawBlende(ctx, bx, cy, spalt, posY, H);
-  drawLamp(ctx, lx, ly);
-
-  // Lamp offset indicator
-  if(Math.abs(lampOff) > 5) {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(100,180,255,0.5)';
-    ctx.setLineDash([4,4]);
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(lx, H/2); ctx.lineTo(lx, ly); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(100,180,255,0.8)';
-    ctx.font = '11px Arial';
-    ctx.fillText('Versatz: '+lampOff+'px', lx+5, (H/2+ly)/2);
-    ctx.restore();
-  }
-
-  ctx.fillStyle = '#aaa';
-  ctx.font = '13px Arial';
-  ctx.fillText('Blende', bx-18, H-12);
-}
-
-// ── SEITE 4: Mehrfachspaltblende ──────────────────────────────────────────
-function draw4() {
-  const canvas = document.getElementById('c4');
-  const W = canvas.width, H = canvas.height;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,W,H);
-
-  const nSpalte = Math.round(val('s4_n'));
-  const br = val('s4_br');
-  const winkel = val('s4_winkel');
-  setLabel('v4_n', nSpalte);
-  setLabel('v4_br', br);
-  setLabel('v4_winkel', winkel);
-
-  ctx.fillStyle = '#050510';
-  ctx.fillRect(0,0,W,H);
-
-  const lx = 80, ly = H/2;
-  const bx = W * 0.42;
-  const rad = winkel * Math.PI / 180;
-  const ex = W - 20;
-
-  // Total height used by slits
-  const totalSpacing = 20;
-  const totalH = nSpalte * br + (nSpalte - 1) * totalSpacing;
-  const startY = ly - totalH / 2;
-
-  // Draw lamp bundle (full)
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(lx, ly);
-  ctx.lineTo(bx, ly + Math.tan(-rad/2)*(bx-lx));
-  ctx.lineTo(bx, ly + Math.tan(rad/2)*(bx-lx));
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(245,197,24,0.05)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(245,197,24,0.3)';
-  ctx.lineWidth = 1.5;
-  ctx.moveTo(lx,ly); ctx.lineTo(bx, ly+Math.tan(-rad/2)*(bx-lx)); ctx.stroke();
-  ctx.moveTo(lx,ly); ctx.lineTo(bx, ly+Math.tan(rad/2)*(bx-lx)); ctx.stroke();
-  ctx.restore();
-
-  // Draw multi-slit blende
-  const bundleTop_bx = ly + Math.tan(-rad/2)*(bx-lx);
-  const bundleBot_bx = ly + Math.tan(rad/2)*(bx-lx);
-
-  // Build slit positions
-  const slits = [];
-  for(let i=0; i<nSpalte; i++) {
-    const topY = startY + i*(br+totalSpacing);
-    slits.push({ top: topY, bot: topY + br });
-  }
-
-  // Draw opaque parts of blende
-  ctx.save();
-  ctx.fillStyle = '#2a2a4a';
-  ctx.strokeStyle = '#555';
-  ctx.lineWidth = 1;
-
-  // Build opaque segments
-  let opaqueSegs = [];
-  opaqueSegs.push([0, slits[0].top]);
-  for(let i=0; i<slits.length-1; i++) {
-    opaqueSegs.push([slits[i].bot, slits[i+1].top]);
-  }
-  opaqueSegs.push([slits[slits.length-1].bot, H]);
-
-  opaqueSegs.forEach(([t,b]) => {
-    if(b > t) {
-      ctx.fillRect(bx-5, t, 10, b-t);
-      ctx.strokeRect(bx-5, t, 10, b-t);
-    }
-  });
-  ctx.restore();
-
-  // Slit gap lines
-  slits.forEach(s => {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(245,197,24,0.4)';
-    ctx.setLineDash([3,3]);
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(bx, s.top); ctx.lineTo(bx, s.bot); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
-  });
-
-  // For each slit: compute passing light
-  slits.forEach((s, idx) => {
-    const passTop = Math.max(Math.min(bundleTop_bx, bundleBot_bx), s.top);
-    const passBot = Math.min(Math.max(bundleTop_bx, bundleBot_bx), s.bot);
-    if(passBot <= passTop) return;
-
-    // Direction: lamp → slit edge → continue (no bend)
-    const angTop = Math.atan2(passTop - ly, bx - lx);
-    const angBot = Math.atan2(passBot - ly, bx - lx);
-    const eyTop = passTop + Math.tan(angTop) * (ex - bx);
-    const eyBot = passBot + Math.tan(angBot) * (ex - bx);
-
-    // Fill cone
-    if(state.fill4) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(bx, passTop);
-      ctx.lineTo(ex, eyTop);
-      ctx.lineTo(ex, eyBot);
-      ctx.lineTo(bx, passBot);
-      ctx.closePath();
-      const hue = (idx * 60) % 360;
-      ctx.fillStyle = `hsla(${hue + 40}, 90%, 60%, 0.12)`;
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // Randstrahlen
-    if(state.rand4) {
-      [[passTop, eyTop],[passBot, eyBot]].forEach(([sy, ey]) => {
-        ctx.save();
-        ctx.strokeStyle = '#ff4444';
-        ctx.lineWidth = 2;
-        ctx.shadowColor = '#ff4444'; ctx.shadowBlur = 6;
-        ctx.beginPath(); ctx.moveTo(bx,sy); ctx.lineTo(ex,ey); ctx.stroke();
-        ctx.restore();
-      });
-    }
-  });
-
-  drawLamp(ctx, lx, ly);
-
-  // Label
-  ctx.fillStyle = '#aaa';
-  ctx.font = '13px Arial';
-  ctx.fillText('Mehrfachblende', bx-38, H-12);
-  ctx.fillStyle = 'rgba(245,197,24,0.6)';
-  ctx.font = '12px Arial';
-  ctx.fillText(nSpalte + (nSpalte===1?' Spalt':' Spalte'), bx+12, H/2 - totalH/2 - 10);
-}
-
-// ── Navigation ─────────────────────────────────────────────────────────────
-function showPage(i) {
-  document.querySelectorAll('.page').forEach((p,j) => p.classList.toggle('active', j===i));
-  document.querySelectorAll('nav button').forEach((b,j) => b.classList.toggle('active', j===i));
-  [draw1, draw2, draw3, draw4][i]();
-}
-
-// ── Init ───────────────────────────────────────────────────────────────────
-window.addEventListener('load', () => {
-  draw1();
-});
-
-window.addEventListener('resize', () => {
-  const active = document.querySelector('.page.active');
-  if(!active) return;
-  const idx = [...document.querySelectorAll('.page')].indexOf(active);
-  [draw1, draw2, draw3, draw4][idx]();
-});
 </script>
 </body>
 </html>
