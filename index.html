@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINT-Simulationen | Inhaltsverzeichnis</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a1a2e; }
+  header { background: #1a1a2e; color: #fff; padding: 20px 28px; border-bottom: 4px solid #f5c518; }
+  header h1 { font-size: 1.4rem; }
+  header p { font-size: 0.82rem; color: #aaa; margin-top: 4px; }
+  .search-bar { max-width: 900px; margin: 20px auto 0; padding: 0 20px; }
+  .search-bar input { width: 100%; padding: 12px 16px; border: 1.5px solid #ddd; border-radius: 10px; font-size: 0.95rem; outline: none; }
+  main { max-width: 900px; margin: 16px auto; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .sim-card { background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); display: flex; gap: 14px; }
+  .sim-icon { font-size: 2rem; flex-shrink: 0; }
+  .sim-body h3 { font-size: 0.95rem; margin-bottom: 4px; }
+  .sim-meta { font-size: 0.75rem; color: #888; margin-bottom: 8px; }
+  .sim-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+  .tag { background: #e8f4fd; color: #1a73e8; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; }
+  .sim-links { display: flex; gap: 8px; }
+  .btn-sim, .btn-info { padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 600; }
+  .btn-sim { background: #1a73e8; color: #fff; }
+  .btn-info { background: #f0f4f8; color: #444; border: 1px solid #ddd; }
+  footer { text-align: center; padding: 20px; font-size: 0.75rem; color: #888; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🧪 MINT-Simulationen</h1>
+  <p>Interaktive Schülerversuche für iPad und ActiveBoard</p>
+</header>
+<div class="search-bar">
+  <input type="text" placeholder="Suchen..." id="search" oninput="filterCards()">
+</div>
+<main id="cards">
+
+    <div class="sim-card" data-fach="physik" data-klasse="klasse-6" data-tags="optik randstrahlen lichtbündel blende">
+      <div class="sim-icon">🔦</div>
+      <div class="sim-body">
+        <h3>Ausbreitung des Lichts – Randstrahlen</h3>
+        <div class="sim-meta">Physik · Klasse 6 · Optik · Schülerversuch</div>
+        <div class="sim-tags">
+          <span class="tag">Optik</span><span class="tag">Randstrahlen</span>
+          <span class="tag">Lichtbündel</span><span class="tag">Blende</span><span class="tag">Klasse 6</span>
+        </div>
+        <div class="sim-links">
+          <a href="physik/klasse-6/optik/lichtausbreitung-randstrahlen/simulation.html" class="btn-sim">▶ Simulation</a>
+          <a href="physik/klasse-6/optik/lichtausbreitung-randstrahlen/info.html" class="btn-info">ℹ️ Info</a>
+        </div>
+      </div>
+    </div>
+</main>
+<footer>mint-simulationen · github.io/semmikgs</footer>
+<script>
+function filterCards() {
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.sim-card').forEach(c => {
+    const txt = c.textContent.toLowerCase() + c.dataset.tags;
+    c.style.display = txt.includes(q) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
