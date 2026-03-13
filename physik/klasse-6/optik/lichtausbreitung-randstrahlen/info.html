@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Info: Ausbreitung des Lichts – Randstrahlen | Physik Klasse 6</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f7fa; --card: #fff; --accent: #e94560; --blue: #1a73e8;
+    --yellow: #f5a623; --dark: #1a1a2e; --gray: #666;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--dark); }
+  header {
+    background: var(--dark); color: #fff;
+    padding: 20px 32px;
+    display: flex; align-items: center; gap: 16px;
+    border-bottom: 4px solid var(--yellow);
+  }
+  header .icon { font-size: 2.5rem; }
+  header h1 { font-size: 1.4rem; margin-bottom: 4px; }
+  header .sub { font-size: 0.85rem; color: #aaa; }
+  main { max-width: 860px; margin: 0 auto; padding: 28px 20px; display: flex; flex-direction: column; gap: 20px; }
+  .card {
+    background: var(--card); border-radius: 12px;
+    padding: 20px 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .card h2 { color: var(--accent); font-size: 1rem; margin-bottom: 12px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; }
+  .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .meta-item { background: #f8f9fa; border-radius: 8px; padding: 10px 14px; }
+  .meta-item .key { font-size: 0.72rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+  .meta-item .val { font-size: 0.95rem; font-weight: 600; color: var(--dark); margin-top: 2px; }
+  ul, ol { padding-left: 20px; line-height: 1.9; font-size: 0.9rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .tag { background: #e8f4fd; color: var(--blue); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+  .qr-section { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  #qrcode { padding: 12px; background: #fff; border-radius: 8px; box-shadow: 0 0 0 1px #eee; }
+  .btn { padding: 10px 22px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: all 0.2s; }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: #1557c0; }
+  .btn-outline { background: none; border: 2px solid var(--blue); color: var(--blue); }
+  .btn-outline:hover { background: #e8f4fd; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .url-box { font-family: monospace; font-size: 0.82rem; background: #f0f4f8; padding: 10px 14px; border-radius: 6px; word-break: break-all; color: var(--dark); }
+  /* QR Overlay */
+  #qr-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88); z-index: 100;
+    justify-content: center; align-items: center; flex-direction: column; gap: 20px;
+  }
+  #qr-overlay.show { display: flex; }
+  #qr-big { background: #fff; padding: 20px; border-radius: 12px; }
+  #qr-overlay .close-btn { color: #fff; font-size: 1rem; cursor: pointer; background: rgba(255,255,255,0.15); border: none; padding: 10px 24px; border-radius: 8px; }
+  footer { text-align: center; padding: 16px; font-size: 0.75rem; color: var(--gray); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="icon">🔦</div>
+  <div>
+    <h1>Ausbreitung des Lichts – Randstrahlen</h1>
+    <div class="sub">Lehrer-Infoseite · Physik · Klasse 6 · Optik</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Metadaten -->
+  <div class="card">
+    <h2>📋 Metadaten</h2>
+    <div class="meta-grid">
+      <div class="meta-item"><div class="key">Fach</div><div class="val">Physik</div></div>
+      <div class="meta-item"><div class="key">Klassenstufe</div><div class="val">Klasse 6</div></div>
+      <div class="meta-item"><div class="key">Oberthema</div><div class="val">Optik</div></div>
+      <div class="meta-item"><div class="key">Thema</div><div class="val">Ausbreitung des Lichts</div></div>
+      <div class="meta-item"><div class="key">Typ</div><div class="val">Schülerversuch</div></div>
+      <div class="meta-item"><div class="key">Dauer</div><div class="val">ca. 20–30 min</div></div>
+    </div>
+  </div>
+
+  <!-- Kurzbeschreibung -->
+  <div class="card">
+    <h2>📝 Kurzbeschreibung</h2>
+    <p style="font-size:0.9rem;line-height:1.7">
+      Interaktive Simulation zur geradlinigen Ausbreitung des Lichts mit Fokus auf Randstrahlen und Lichtbündel.
+      Schüler erkunden auf vier Seiten das Verhalten von Lichtbündeln an Blenden (Einfachspalt, verschobener Spalt, Mehrfachspalt).
+      Schieberegler ermöglichen ein aktives Experimentieren ohne physische Geräte.
+    </p>
+  </div>
+
+  <!-- Lernziele -->
+  <div class="card">
+    <h2>🎯 Lernziele</h2>
+    <ul>
+      <li>Schüler kennen den Begriff <strong>Lichtbündel</strong> und können es von einem einzelnen Lichtstrahl unterscheiden.</li>
+      <li>Schüler verstehen, was <strong>Randstrahlen</strong> sind und warum man sie zeichnet.</li>
+      <li>Schüler können beschreiben, wie eine <strong>Blende</strong> ein Lichtbündel verändert.</li>
+      <li>Schüler erkennen, dass eine versetzte Lichtquelle die Richtung des Bündels ändert.</li>
+      <li>Schüler verstehen, dass eine Mehrfachblende mehrere Teilbündel erzeugt.</li>
+    </ul>
+  </div>
+
+  <!-- Seiten-Übersicht -->
+  <div class="card">
+    <h2>📚 Seiten der Simulation</h2>
+    <ol style="line-height:2.2">
+      <li><strong>Lichtbündel → Randstrahlen:</strong> Öffnungswinkel und Strahlenzahl variieren, Randstrahlen ein-/ausblenden.</li>
+      <li><strong>Licht an einer Blende (1 Spalt):</strong> Spaltbreite und -position verstellen, beobachten welche Strahlen passieren.</li>
+      <li><strong>Lampe versetzt (off-center):</strong> Lampenposition verschieben, Wirkung auf den Strahlengang beobachten.</li>
+      <li><strong>Mehrfachspaltblende:</strong> Anzahl und Breite der Spalte variieren, Entstehung mehrerer Teilbündel erkennen.</li>
+    </ol>
+  </div>
+
+  <!-- Hinweise für Lehrer -->
+  <div class="card">
+    <h2>👩‍🏫 Hinweise für Lehrkräfte</h2>
+    <ul>
+      <li>Simulation funktioniert ohne Installation direkt im Browser (Safari, Chrome, Firefox).</li>
+      <li>Touch-optimiert für iPad; auch am Beamer/ActiveBoard bedienbar.</li>
+      <li>Empfehlung: Seite 1 gemeinsam einführen, Seiten 2–4 als Schülerversuch.</li>
+      <li>Reflexionsfragen am Ende jeder Seite können als Heftaufgabe genutzt werden.</li>
+      <li>Bei Seite 3 darauf hinweisen: Kein Licht → Meldung erscheint automatisch.</li>
+    </ul>
+  </div>
+
+  <!-- Hinweise für Schüler -->
+  <div class="card">
+    <h2>🧑‍🎓 Hinweise für Schüler</h2>
+    <ul>
+      <li>Benutze die Regler, um die Simulation zu verändern.</li>
+      <li>Beantworte die Fragen am Ende jeder Seite schriftlich.</li>
+      <li>Du kannst Randstrahlen ein- und ausschalten – was verändert sich?</li>
+    </ul>
+  </div>
+
+  <!-- Tags -->
+  <div class="card">
+    <h2>🏷️ Tags</h2>
+    <div class="tags">
+      <span class="tag">Optik</span>
+      <span class="tag">Lichtausbreitung</span>
+      <span class="tag">Randstrahlen</span>
+      <span class="tag">Lichtbündel</span>
+      <span class="tag">Blende</span>
+      <span class="tag">Mehrfachspalt</span>
+      <span class="tag">Klasse 6</span>
+      <span class="tag">Schülerversuch</span>
+      <span class="tag">iPad</span>
+    </div>
+  </div>
+
+  <!-- QR-Code -->
+  <div class="card">
+    <h2>📱 QR-Code & Link</h2>
+    <div class="qr-section">
+      <div id="qrcode"></div>
+      <div class="url-box" id="sim-url">https://semmikgs.github.io/mint-simulationen/physik/klasse-6/optik/lichtausbreitung-randstrahlen/simulation.html</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="showQROverlay()">🔍 QR-Code groß anzeigen</button>
+        <button class="btn btn-outline" onclick="printQR()">🖨️ QR-Code drucken</button>
+        <a class="btn btn-primary" id="sim-link" href="#" target="_blank">▶ Simulation öffnen</a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>Physik · Klasse 6 · Optik · Schülerversuch · mint-simulationen</footer>
+
+<!-- QR Overlay -->
+<div id="qr-overlay">
+  <div id="qr-big"></div>
+  <button class="close-btn" onclick="closeQROverlay()">✕ Schließen</button>
+</div>
+
+<script>
+const SIM_URL = 'https://semmikgs.github.io/mint-simulationen/physik/klasse-6/optik/lichtausbreitung-randstrahlen/simulation.html';
+document.getElementById('sim-url').textContent = SIM_URL;
+document.getElementById('sim-link').href = SIM_URL;
+
+// QR klein
+new QRCode(document.getElementById('qrcode'), {
+  text: SIM_URL, width: 160, height: 160,
+  colorDark: '#1a1a2e', colorLight: '#ffffff',
+  correctLevel: QRCode.CorrectLevel.M
+});
+
+function showQROverlay() {
+  document.getElementById('qr-big').innerHTML = '';
+  new QRCode(document.getElementById('qr-big'), {
+    text: SIM_URL, width: 300, height: 300,
+    colorDark: '#000000', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+  document.getElementById('qr-overlay').classList.add('show');
+}
+function closeQROverlay() {
+  document.getElementById('qr-overlay').classList.remove('show');
+}
+function printQR() {
+  const w = window.open('', '_blank');
+  const canvas = document.querySelector('#qrcode canvas');
+  w.document.write(`<html><body style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column">
+    <h2 style="font-family:Arial;margin-bottom:16px">Ausbreitung des Lichts – Randstrahlen</h2>
+    <img src="${canvas.toDataURL()}" style="width:250px;height:250px">
+    <p style="font-family:Arial;font-size:12px;margin-top:12px;color:#666">${SIM_URL}</p>
+  </body></html>`);
+  w.print();
+}
+</script>
+</body>
+</html>
