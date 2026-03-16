@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Schattenbildung | Physik Klasse 6</title>
+<!--
+  MINT-Simulation: Schattenbildung hinter Objekten
+  Fach: Physik | Klasse: 6 | Oberthema: Optik
+  Thema: Ausbreitung des Lichts hinter Objekten
+  Typ: Schülerversuch
+  Datei: physik_kl6_optik_schatten.html
+  Lernziele:
+    - Schattenraum hinter einem Objekt beschreiben
+    - Einfluss der Objektposition auf Schattengröße erklären
+    - Einfluss der Lichtquellenposition auf Schattengröße erklären
+    - Einfluss des Schirmabstands auf Schattengröße erklären
+    - Schattenraum geometrisch konstruieren
+-->
+<style>
+  :root {
+    --bg: #1a1a2e; --panel: #16213e; --card: #0f3460;
+    --accent: #e94560; --yellow: #f5c518; --white: #eaeaea;
+    --gray: #888; --radius: 12px; --shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; display: flex; flex-direction: column; }
+  header { background: var(--panel); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--accent); box-shadow: var(--shadow); }
+  header h1 { font-size: 1.1rem; color: var(--yellow); }
+  header .meta { font-size: 0.75rem; color: var(--gray); }
+  nav { display: flex; background: var(--panel); padding: 0 10px; gap: 4px; overflow-x: auto; }
+  nav button { padding: 10px 14px; background: none; border: none; color: var(--gray); font-size: 0.8rem; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.2s; touch-action: manipulation; }
+  nav button.active { color: var(--yellow); border-bottom-color: var(--yellow); font-weight: bold; }
+  nav button:hover { color: var(--white); }
+  main { flex: 1; display: flex; flex-direction: column; padding: 14px; gap: 12px; max-width: 900px; width: 100%; margin: 0 auto; }
+  .page { display: none; flex-direction: column; gap: 12px; }
+  .page.active { display: flex; }
+  .aufgabe { background: var(--card); border-left: 4px solid var(--yellow); border-radius: var(--radius); padding: 11px 15px; font-size: 0.88rem; line-height: 1.5; }
+  .aufgabe strong { color: var(--yellow); }
+  .canvas-wrap { background: #000; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  canvas { display: block; width: 100%; height: auto; touch-action: none; }
+  .controls { background: var(--panel); border-radius: var(--radius); padding: 13px 15px; display: flex; flex-direction: column; gap: 10px; }
+  .ctrl-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ctrl-label { font-size: 0.8rem; color: var(--gray); min-width: 180px; }
+  .ctrl-label span { color: var(--yellow); font-weight: bold; }
+  input[type=range] { -webkit-appearance: none; flex: 1; min-width: 120px; height: 6px; background: var(--card); border-radius: 4px; outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--yellow); cursor: pointer; box-shadow: 0 0 6px rgba(245,197,24,0.6); }
+  .toggle-btn { padding: 8px 16px; border: 2px solid var(--yellow); background: none; color: var(--yellow); border-radius: 8px; font-size: 0.83rem; cursor: pointer; transition: all 0.2s; touch-action: manipulation; }
+  .toggle-btn.on { background: var(--yellow); color: #000; }
+  .fragen { background: var(--panel); border-radius: var(--radius); padding: 13px 15px; }
+  .fragen h3 { color: var(--accent); margin-bottom: 8px; font-size: 0.88rem; }
+  .fragen ol { padding-left: 18px; font-size: 0.84rem; line-height: 1.9; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.76rem; color: var(--gray); }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+  footer { text-align: center; padding: 10px; font-size: 0.72rem; color: var(--gray); border-top: 1px solid var(--card); }
+
+  /* Konstruktions-Seite */
+  .aufg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .aufg-item { background: var(--panel); border-radius: var(--radius); overflow: hidden; }
+  .aufg-item canvas { display: block; width: 100%; height: auto; cursor: crosshair; }
+  .aufg-item .aufg-label { font-size: 0.78rem; color: var(--gray); padding: 6px 10px; text-align: center; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-reset { padding: 8px 16px; border: 2px solid var(--accent); background: none; color: var(--accent); border-radius: 8px; font-size: 0.82rem; cursor: pointer; touch-action: manipulation; }
+  .btn-loesung { padding: 8px 16px; border: 2px solid #4caf50; background: none; color: #4caf50; border-radius: 8px; font-size: 0.82rem; cursor: pointer; touch-action: manipulation; }
+  .btn-loesung.on { background: #4caf50; color: #000; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🌑 Schattenbildung</h1>
+    <div class="meta">Physik · Klasse 6 · Optik · Schülerversuch · physik_kl6_optik_schatten</div>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showPage(0)">1 · Objekt verschieben</button>
+  <button onclick="showPage(1)">2 · Lichtquelle verschieben</button>
+  <button onclick="showPage(2)">3 · Schirm verschieben</button>
+  <button onclick="showPage(3)">4 · Konstruktion</button>
+</nav>
+
+<main>
+
+<!-- ═══ SEITE 1: Objekt verschieben ═══ -->
+<div class="page active" id="page0">
+  <div class="aufgabe">
+    <strong>Aufgabe:</strong> Verschiebe das <strong>Objekt</strong> zwischen Lichtquelle und Schirm.<br>
+    Beobachte: Wie verändert sich die Größe und Schärfe des Schattens?
+  </div>
+  <div class="canvas-wrap"><canvas id="c1" width="800" height="340"></canvas></div>
+  <div class="controls">
+    <div class="ctrl-row">
+      <div class="ctrl-label">Objekt-Position: <span id="v1_obj">Mitte</span></div>
+      <input type="range" id="s1_obj" min="0" max="100" value="50" oninput="draw1()">
+    </div>
+    <div class="ctrl-row">
+      <button class="toggle-btn on" id="btn1_rand" onclick="tog('rand1');draw1()">Randstrahlen: AN</button>
+      <button class="toggle-btn on" id="btn1_schatten" onclick="tog('schatten1');draw1()">Schattenraum: AN</button>
+    </div>
+  </div>
+  <div class="legend">
+    <span><div class="dot" style="background:#f5c518;opacity:.5"></div> Lichtbündel</span>
+    <span><div class="dot" style="background:#ff4444"></div> Randstrahlen</span>
+    <span><div class="dot" style="background:rgba(0,0,0,0.7);border:1px solid #555"></div> Schattenraum</span>
+  </div>
+  <div class="fragen">
+    <h3>🤔 Fragen zum Nachdenken</h3>
+    <ol>
+      <li>Was passiert mit dem Schatten, wenn das Objekt näher zum Schirm rückt?</li>
+      <li>Was passiert, wenn das Objekt näher zur Lichtquelle rückt?</li>
+      <li>Wann ist der Schatten am schärfsten?</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ═══ SEITE 2: Lichtquelle verschieben ═══ -->
+<div class="page" id="page1">
+  <div class="aufgabe">
+    <strong>Aufgabe:</strong> Verschiebe die <strong>Lichtquelle</strong> näher ans Objekt oder weiter weg.<br>
+    Beobachte: Was passiert mit dem Schatten auf dem Schirm?
+  </div>
+  <div class="canvas-wrap"><canvas id="c2" width="800" height="340"></canvas></div>
+  <div class="controls">
+    <div class="ctrl-row">
+      <div class="ctrl-label">Lichtquelle-Abstand: <span id="v2_lq">Mitte</span></div>
+      <input type="range" id="s2_lq" min="0" max="100" value="50" oninput="draw2()">
+    </div>
+    <div class="ctrl-row">
+      <button class="toggle-btn on" id="btn2_rand" onclick="tog('rand2');draw2()">Randstrahlen: AN</button>
+      <button class="toggle-btn on" id="btn2_schatten" onclick="tog('schatten2');draw2()">Schattenraum: AN</button>
+    </div>
+  </div>
+  <div class="legend">
+    <span><div class="dot" style="background:#f5c518;opacity:.5"></div> Lichtbündel</span>
+    <span><div class="dot" style="background:#ff4444"></div> Randstrahlen</span>
+    <span><div class="dot" style="background:rgba(0,0,0,0.7);border:1px solid #555"></div> Schattenraum</span>
+  </div>
+  <div class="fragen">
+    <h3>🤔 Fragen zum Nachdenken</h3>
+    <ol>
+      <li>Was passiert mit dem Schatten, wenn die Lichtquelle näher ans Objekt rückt?</li>
+      <li>Was passiert, wenn die Lichtquelle weiter entfernt wird?</li>
+      <li>Warum ändert sich die Schattengröße, obwohl das Objekt gleich bleibt?</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ═══ SEITE 3: Schirm verschieben ═══ -->
+<div class="page" id="page2">
+  <div class="aufgabe">
+    <strong>Aufgabe:</strong> Verschiebe den <strong>Schirm</strong> näher ans Objekt oder weiter weg.<br>
+    Beobachte: Wie verändert sich das Schattenbild auf dem Schirm?
+  </div>
+  <div class="canvas-wrap"><canvas id="c3" width="800" height="340"></canvas></div>
+  <div class="controls">
+    <div class="ctrl-row">
+      <div class="ctrl-label">Schirm-Position: <span id="v3_schirm">weit</span></div>
+      <input type="range" id="s3_schirm" min="0" max="100" value="80" oninput="draw3()">
+    </div>
+    <div class="ctrl-row">
+      <button class="toggle-btn on" id="btn3_rand" onclick="tog('rand3');draw3()">Randstrahlen: AN</button>
+      <button class="toggle-btn on" id="btn3_schatten" onclick="tog('schatten3');draw3()">Schattenraum: AN</button>
+    </div>
+  </div>
+  <div class="legend">
+    <span><div class="dot" style="background:#f5c518;opacity:.5"></div> Lichtbündel</span>
+    <span><div class="dot" style="background:#ff4444"></div> Randstrahlen</span>
+    <span><div class="dot" style="background:rgba(0,0,0,0.7);border:1px solid #555"></div> Schattenraum</span>
+  </div>
+  <div class="fragen">
+    <h3>🤔 Fragen zum Nachdenken</h3>
+    <ol>
+      <li>Was passiert mit dem Schatten auf dem Schirm, wenn der Schirm näher rückt?</li>
+      <li>Was passiert, wenn der Schirm weiter entfernt wird?</li>
+      <li>Wann ist der Schatten auf dem Schirm am kleinsten?</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ═══ SEITE 4: Konstruktion prüfen ═══ -->
+<div class="page" id="page3">
+  <div class="aufgabe">
+    <strong>Arbeitsblatt prüfen:</strong> Stelle die Situation aus deiner Aufgabe nach — verschiebe
+    <strong>Lichtquelle</strong>, <strong>Objekt</strong> und <strong>Schirm</strong> mit den Reglern.<br>
+    Vergleiche dann den Schattenraum mit deiner Bleistift-Konstruktion.
+  </div>
+  <div class="canvas-wrap"><canvas id="c4" width="800" height="360"></canvas></div>
+  <div class="controls">
+    <div class="ctrl-row">
+      <div class="ctrl-label">⊗ Lichtquelle: <span id="v4_lq">links</span></div>
+      <input type="range" id="s4_lq" min="0" max="100" value="10" oninput="draw4()">
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-label">▪ Objekt-Position: <span id="v4_obj">Mitte</span></div>
+      <input type="range" id="s4_obj" min="5" max="85" value="42" oninput="draw4()">
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-label">▌ Schirm-Position: <span id="v4_schirm">rechts</span></div>
+      <input type="range" id="s4_schirm" min="20" max="100" value="85" oninput="draw4()">
+    </div>
+    <div class="ctrl-row">
+      <button class="toggle-btn on" id="btn4_rand" onclick="tog('rand4');draw4()">Randstrahlen: AN</button>
+      <button class="toggle-btn on" id="btn4_schatten" onclick="tog('schatten4');draw4()">Schattenraum: AN</button>
+    </div>
+  </div>
+  <div class="legend">
+    <span><div class="dot" style="background:#f5c518"></div> Lichtquelle</span>
+    <span><div class="dot" style="background:#778899"></div> Objekt</span>
+    <span><div class="dot" style="background:#eee"></div> Schirm</span>
+    <span><div class="dot" style="background:#ff4444"></div> Randstrahlen</span>
+    <span><div class="dot" style="background:rgba(0,0,0,0.7);border:1px solid #555"></div> Schattenraum</span>
+  </div>
+  <div class="fragen">
+    <h3>🤔 Fragen zum Nachdenken</h3>
+    <ol>
+      <li>Stimmt deine Konstruktion mit dem Schattenraum in der Simulation überein?</li>
+      <li>Stelle die Situation aus Aufgabe 4 nach: Lichtquelle nah am Objekt. Was beobachtest du?</li>
+      <li>Welche Position von Objekt und Schirm ergibt den kleinsten Schatten?</li>
+    </ol>
+  </div>
+</div>
+
+</main>
+<footer>Physik · Klasse 6 · Optik – Schattenbildung · physik_kl6_optik_schatten.html</footer>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+const S = {
+  rand1:true, schatten1:true,
+  rand2:true, schatten2:true,
+  rand3:true, schatten3:true,
+  rand4:true, schatten4:true
+};
+
+function tog(k) {
+  S[k] = !S[k];
+  document.querySelectorAll('.toggle-btn').forEach(b => {
+    const oc = b.getAttribute('onclick') || '';
+    if (oc.includes("'"+k+"'")) {
+      b.textContent = b.textContent.split(':')[0] + ': ' + (S[k]?'AN':'AUS');
+      b.classList.toggle('on', S[k]);
+    }
+  });
+}
+function val(id) { return parseFloat(document.getElementById(id).value); }
+function setL(id, v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+
+// ── Shared helpers ─────────────────────────────────────────────────────────
+function drawLampSymbol(ctx, x, y, sz) {
+  sz = sz||22;
+  ctx.save(); ctx.strokeStyle='#f5c518'; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.arc(x,y,sz*.55,0,Math.PI*2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x-sz*.38,y-sz*.38); ctx.lineTo(x+sz*.38,y+sz*.38);
+  ctx.moveTo(x+sz*.38,y-sz*.38); ctx.lineTo(x-sz*.38,y+sz*.38);
+  ctx.stroke(); ctx.restore();
+}
+
+function drawObject(ctx, ox, oy, ow, oh) {
+  ctx.save();
+  ctx.fillStyle='#778899';
+  ctx.fillRect(ox-ow/2, oy-oh/2, ow, oh);
+  ctx.strokeStyle='#aab'; ctx.lineWidth=1.5;
+  ctx.strokeRect(ox-ow/2, oy-oh/2, ow, oh);
+  ctx.restore();
+}
+
+function drawSchirmStrip(ctx, sx, H, shadowTop, shadowBot) {
+  // Full schirm
+  ctx.save();
+  ctx.fillStyle='#eee'; ctx.fillRect(sx, 0, 16, H);
+  ctx.strokeStyle='#666'; ctx.lineWidth=1; ctx.strokeRect(sx, 0, 16, H);
+  // Shadow on schirm
+  if(shadowBot > shadowTop) {
+    ctx.fillStyle='#222';
+    ctx.fillRect(sx, shadowTop, 16, shadowBot-shadowTop);
+  }
+  ctx.restore();
+}
+
+// ── Shadow geometry ────────────────────────────────────────────────────────
+// Returns {topY, botY} of shadow on schirm at x=sx
+// lx,ly = lamp, ox,oy,oh = object center+halfheight, sx = schirm x
+function shadowOnSchirm(lx, ly, ox, oy, oh, sx) {
+  const objTop = oy - oh/2;
+  const objBot = oy + oh/2;
+  // Ray from lamp through top-edge of object
+  const angT = Math.atan2(objTop - ly, ox - lx);
+  const angB = Math.atan2(objBot - ly, ox - lx);
+  const shadowTop = objTop + Math.tan(angT)*(sx - ox);
+  const shadowBot = objBot + Math.tan(angB)*(sx - ox);
+  return { top: shadowTop, bot: shadowBot };
+}
+
+function drawShadowScene(ctx, W, H, lx, ly, ox, oy, ow, oh, sx, showRand, showShadow, lampSz) {
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#050510'; ctx.fillRect(0,0,W,H);
+
+  const objTop = oy-oh/2, objBot = oy+oh/2;
+
+  // Ambient light fill (from lamp, truncated by object)
+  ctx.save();
+  const halfA = 40*Math.PI/180;
+  const bTop = ly + Math.tan(-halfA)*(sx-lx);
+  const bBot = ly + Math.tan( halfA)*(sx-lx);
+  ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(sx,bTop); ctx.lineTo(sx,bBot); ctx.closePath();
+  ctx.fillStyle='rgba(245,197,24,0.06)'; ctx.fill(); ctx.restore();
+
+  // Shadow region (cone from lamp edges through object edges)
+  const angT = Math.atan2(objTop-ly, ox-lx);
+  const angB = Math.atan2(objBot-ly, ox-lx);
+  const shTop_sx = objTop + Math.tan(angT)*(sx-ox);
+  const shBot_sx = objBot + Math.tan(angB)*(sx-ox);
+
+  if(showShadow) {
+    // Shadow polygon: object → schirm
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(ox-ow/2, objTop);
+    ctx.lineTo(sx, shTop_sx);
+    ctx.lineTo(sx, shBot_sx);
+    ctx.lineTo(ox-ow/2, objBot);
+    ctx.closePath();
+    ctx.fillStyle='rgba(0,0,0,0.72)';
+    ctx.fill();
+    // Label Schattenraum
+    const midX=(ox+sx)/2, midY=(shTop_sx+shBot_sx)/2+Math.abs(shBot_sx-shTop_sx)*0.1;
+    ctx.fillStyle='rgba(200,200,200,0.5)'; ctx.font='italic 11px Arial'; ctx.textAlign='center';
+    ctx.fillText('Schattenraum', midX, midY); ctx.restore();
+  }
+
+  // Randstrahlen
+  if(showRand) {
+    [[objTop, shTop_sx],[objBot, shBot_sx]].forEach(([oy2,ey])=>{
+      ctx.save(); ctx.strokeStyle='#ff4444'; ctx.lineWidth=2.2;
+      ctx.shadowColor='#ff4444'; ctx.shadowBlur=7;
+      ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(sx,ey); ctx.stroke();
+      ctx.restore();
+    });
+  }
+
+  // Schirm + shadow stripe
+  drawSchirmStrip(ctx, sx, H, shTop_sx, shBot_sx);
+
+  // Object
+  drawObject(ctx, ox, oy, ow, oh);
+
+  // Lamp
+  drawLampSymbol(ctx, lx, ly, lampSz||22);
+
+  // Labels
+  ctx.fillStyle='#888'; ctx.font='11px Arial'; ctx.textAlign='center';
+  ctx.fillText('Lichtquelle', lx, H-8);
+  ctx.fillText('Objekt', ox, H-8);
+  ctx.fillText('Schirm', sx+8, H-8);
+
+  // Shadow size indicator on schirm
+  if(shBot_sx > shTop_sx) {
+    const h = Math.round(Math.abs(shBot_sx-shTop_sx));
+    ctx.fillStyle='rgba(200,200,220,0.7)'; ctx.font='bold 11px Arial'; ctx.textAlign='left';
+    ctx.fillText('Schatten: '+h+'px', sx+20, (shTop_sx+shBot_sx)/2+4);
+  }
+}
+
+// ── SEITE 1: Objekt verschieben ────────────────────────────────────────────
+function draw1() {
+  const cv=document.getElementById('c1');
+  const W=cv.width, H=cv.height, ctx=cv.getContext('2d');
+  const t = val('s1_obj')/100; // 0=near lamp, 1=near schirm
+  const lx=80, ly=H/2, sx=W-60;
+  const ox = lx + 80 + t*(sx-lx-180);
+  const oy = H/2, ow=28, oh=70;
+  const label = t<0.2?'nah an Quelle':t>0.8?'nah am Schirm':'Mitte';
+  setL('v1_obj', label);
+  drawShadowScene(ctx,W,H,lx,ly,ox,oy,ow,oh,sx,S.rand1,S.schatten1);
+}
+
+// ── SEITE 2: Lichtquelle verschieben ──────────────────────────────────────
+function draw2() {
+  const cv=document.getElementById('c2');
+  const W=cv.width, H=cv.height, ctx=cv.getContext('2d');
+  const t = val('s2_lq')/100;
+  const ox=W*0.42, oy=H/2, ow=28, oh=70, sx=W-60;
+  const lx = 40 + t*(ox-120);  // 0=very close to object, 1=far left
+  const ly = H/2;
+  const label = t<0.2?'sehr nah':t>0.8?'weit entfernt':'Mitte';
+  setL('v2_lq', label);
+  drawShadowScene(ctx,W,H,lx,ly,ox,oy,ow,oh,sx,S.rand2,S.schatten2);
+}
+
+// ── SEITE 3: Schirm verschieben ────────────────────────────────────────────
+function draw3() {
+  const cv=document.getElementById('c3');
+  const W=cv.width, H=cv.height, ctx=cv.getContext('2d');
+  const t = val('s3_schirm')/100;
+  const lx=80, ly=H/2;
+  const ox=W*0.38, oy=H/2, ow=28, oh=70;
+  const sx = ox+40 + t*(W-100-ox-40);
+  const label = t<0.2?'nah am Objekt':t>0.8?'weit entfernt':'Mitte';
+  setL('v3_schirm', label);
+  drawShadowScene(ctx,W,H,lx,ly,ox,oy,ow,oh,sx,S.rand3,S.schatten3);
+}
+
+// ── SEITE 4: Konstruktion prüfen ──────────────────────────────────────────
+function draw4() {
+  const cv = document.getElementById('c4');
+  const W = cv.width, H = cv.height, ctx = cv.getContext('2d');
+
+  const tLq  = val('s4_lq')  / 100;
+  const tObj = val('s4_obj') / 100;
+  const tSch = val('s4_schirm') / 100;
+
+  const cy = H / 2;
+  const ow = 30, oh = 72;
+  const margin = 55;
+
+  // Alle drei Positionen unabhängig voneinander auf feste Bereiche verteilt
+  const lx = margin        + tLq  * (W * 0.22 - margin);       // 55..176
+  const ox = W * 0.28      + tObj * (W * 0.38);                 // 224..528
+  const sx = W * 0.58      + tSch * (W - margin - W * 0.58);   // 464..745
+
+  // Reihenfolge erzwingen: lx < ox < sx (Clamp)
+  const lx_ = Math.min(lx, ox - 50);
+  const sx_ = Math.max(sx, ox + 50);
+
+  const lqPct  = Math.round(tLq  * 100);
+  const objPct = Math.round(tObj * 100);
+  const schPct = Math.round(tSch * 100);
+  setL('v4_lq',     lqPct  < 20 ? 'ganz links'    : lqPct  > 80 ? 'nah am Objekt'  : 'Mitte');
+  setL('v4_obj',    objPct < 20 ? 'links'          : objPct > 80 ? 'rechts'         : 'Mitte');
+  setL('v4_schirm', schPct < 20 ? 'nah am Objekt'  : schPct > 80 ? 'weit rechts'   : 'Mitte');
+
+  drawShadowScene(ctx, W, H, lx_, cy, ox, cy, ow, oh, sx_, S.rand4, S.schatten4);
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+function showPage(i) {
+  document.querySelectorAll('.page').forEach((p,j)=>p.classList.toggle('active',j===i));
+  document.querySelectorAll('nav button').forEach((b,j)=>b.classList.toggle('active',j===i));
+  [draw1, draw2, draw3, draw4][i]();
+}
+
+window.addEventListener('load', () => { draw1(); draw2(); draw3(); draw4(); });
+window.addEventListener('resize', () => {
+  const idx = [...document.querySelectorAll('.page')].findIndex(p=>p.classList.contains('active'));
+  [draw1, draw2, draw3, draw4][idx]?.();
+});
+</script>
+</body>
+</html>
