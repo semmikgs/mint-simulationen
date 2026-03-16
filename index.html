@@ -18,9 +18,10 @@ main{max-width:900px;margin:16px auto;padding:0 20px;display:grid;grid-template-
 .sim-meta{font-size:.75rem;color:#888;margin-bottom:8px;}
 .sim-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;}
 .tag{background:#e8f4fd;color:#1a73e8;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:600;}
-.sim-links{display:flex;gap:8px;}
-.btn-sim,.btn-info{padding:6px 12px;border-radius:6px;text-decoration:none;font-size:.8rem;font-weight:600;}
-.btn-sim{background:#1a73e8;color:#fff;}.btn-info{background:#f0f4f8;color:#444;border:1px solid #ddd;}
+.sim-links{display:flex;gap:8px;align-items:center;}
+.btn-sim{padding:7px 14px;border-radius:6px;text-decoration:none;font-size:.82rem;font-weight:700;background:#1a73e8;color:#fff;}
+.btn-info{padding:7px 12px;border-radius:6px;text-decoration:none;font-size:.82rem;font-weight:600;background:#f0f4f8;color:#444;border:1.5px solid #ddd;}
+.btn-info:hover{background:#e8eef5;}
 footer{text-align:center;padding:20px;font-size:.75rem;color:#888;}
 </style>
 </head>
@@ -28,19 +29,66 @@ footer{text-align:center;padding:20px;font-size:.75rem;color:#888;}
 <header><h1>🧪 MINT-Simulationen</h1><p>Interaktive Schülerversuche für iPad und ActiveBoard</p></header>
 <div class="search-bar"><input type="text" placeholder="Suchen nach Thema, Klasse, Fach…" id="search" oninput="filterCards()"></div>
 <main id="cards">
- 
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
+  <div class="sim-card" data-tags="optik lichtausbreitung randstrahlen blende klasse-6 physik">
+    <div class="sim-icon">🔦</div>
+    <div class="sim-body">
+      <h3>Lichtausbreitung &amp; Randstrahlen</h3>
+      <div class="sim-meta">Physik · Klasse 6 · Optik · Schülerversuch</div>
+      <div class="sim-tags"><span class="tag">Optik</span><span class="tag">Randstrahlen</span><span class="tag">Klasse 6</span></div>
+      <div class="sim-links">
+        <a href="physik/klasse-6/optik/lichtausbreitung-randstrahlen/simulation.html" class="btn-sim">▶ Simulation</a>
+        <a href="physik/klasse-6/optik/lichtausbreitung-randstrahlen/info.html" class="btn-info">📋 Info &amp; QR</a>
+      </div>
+    </div>
+  </div>
+  <div class="sim-card" data-tags="optik schirmbild blende randstrahlen mehrfachspalt klasse-6 physik">
+    <div class="sim-icon">🔦</div>
+    <div class="sim-body">
+      <h3>Schirmbild an Blenden</h3>
+      <div class="sim-meta">Physik · Klasse 6 · Optik · Schülerversuch</div>
+      <div class="sim-tags"><span class="tag">Optik</span><span class="tag">Schirmbild</span><span class="tag">Mehrfachspalt</span><span class="tag">Klasse 6</span></div>
+      <div class="sim-links">
+        <a href="physik/klasse-6/optik/schirmbild-blenden/physik_kl6_optik_schirmbild.html" class="btn-sim">▶ Simulation</a>
+        <a href="physik/klasse-6/optik/schirmbild-blenden/physik_kl6_optik_schirmbild_info.html" class="btn-info">📋 Info &amp; QR</a>
+      </div>
+    </div>
+  </div>
+  <div class="sim-card" data-tags="optik schatten schattenraum lichtausbreitung klasse-6 physik">
+    <div class="sim-icon">🔦</div>
+    <div class="sim-body">
+      <h3>Schattenbildung hinter Objekten</h3>
+      <div class="sim-meta">Physik · Klasse 6 · Optik · Schülerversuch</div>
+      <div class="sim-tags"><span class="tag">Optik</span><span class="tag">Schatten</span><span class="tag">Klasse 6</span></div>
+      <div class="sim-links">
+        <a href="physik/klasse-6/optik/schatten/physik_kl6_optik_schatten.html" class="btn-sim">▶ Simulation</a>
+        <a href="physik/klasse-6/optik/schatten/physik_kl6_optik_schatten_info.html" class="btn-info">📋 Info &amp; QR</a>
+      </div>
+    </div>
+  </div>
+  <div class="sim-card" data-tags="physik optik klasse">
+    <div class="sim-icon">🔬</div>
+    <div class="sim-body">
+      <h3>Ausbreitung des Lichts – Randstrahlen</h3>
+      <div class="sim-meta">Physik · Klasse 6 · Schülerversuch</div>
+      <div class="sim-tags"><span class="tag">Physik</span><span class="tag">Optik</span><span class="tag">Klasse</span></div>
+      <div class="sim-links">
+        <a href="physik/klasse-6/optik/randstrahlen/physik_kl6_optik_randstrahlen.html" class="btn-sim">▶ Simulation</a>
+        <a href="physik/klasse-6/optik/randstrahlen/physik_kl6_optik_randstrahlen_info.html" class="btn-info">ℹ️ Info &amp; QR</a>
+      </div>
+    </div>
+  </div>
+  <div class="sim-card" data-tags="physik optik klasse">
+    <div class="sim-icon">🔬</div>
+    <div class="sim-body">
+      <h3>Ausbreitung des Lichts – Schirmbild an Blenden</h3>
+      <div class="sim-meta">Physik · Klasse 6 · Schülerversuch</div>
+      <div class="sim-tags"><span class="tag">Physik</span><span class="tag">Optik</span><span class="tag">Klasse</span></div>
+      <div class="sim-links">
+        <a href="physik/klasse-6/optik/schirmbild/physik_kl6_optik_schirmbild.html" class="btn-sim">▶ Simulation</a>
+        <a href="physik/klasse-6/optik/schirmbild/physik_kl6_optik_schirmbild_info.html" class="btn-info">ℹ️ Info &amp; QR</a>
+      </div>
+    </div>
+  </div>
 </main>
 <footer>mint-simulationen · semmikgs.github.io</footer>
 <script>function filterCards(){var q=document.getElementById("search").value.toLowerCase();document.querySelectorAll(".sim-card").forEach(function(c){c.style.display=(c.textContent+c.dataset.tags).toLowerCase().indexOf(q)>=0?"":"none";});}</script>
