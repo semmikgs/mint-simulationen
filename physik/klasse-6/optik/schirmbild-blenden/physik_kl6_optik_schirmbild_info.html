@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Info: Schirmbild an Blenden | Physik Klasse 6</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root { --bg:#f5f7fa;--card:#fff;--accent:#e94560;--blue:#1a73e8;--yellow:#f5a623;--dark:#1a1a2e;--gray:#666; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--dark);}
+  header{background:var(--dark);color:#fff;padding:20px 32px;display:flex;align-items:center;gap:16px;border-bottom:4px solid var(--yellow);}
+  header .icon{font-size:2.5rem;}
+  header h1{font-size:1.4rem;margin-bottom:4px;}
+  header .sub{font-size:0.85rem;color:#aaa;}
+  main{max-width:860px;margin:0 auto;padding:28px 20px;display:flex;flex-direction:column;gap:20px;}
+  .card{background:var(--card);border-radius:12px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.08);}
+  .card h2{color:var(--accent);font-size:1rem;margin-bottom:12px;border-bottom:2px solid #f0f0f0;padding-bottom:8px;}
+  .meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+  .meta-item{background:#f8f9fa;border-radius:8px;padding:10px 14px;}
+  .meta-item .key{font-size:0.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px;}
+  .meta-item .val{font-size:0.95rem;font-weight:600;color:var(--dark);margin-top:2px;}
+  ul,ol{padding-left:20px;line-height:1.9;font-size:0.9rem;}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .tag{background:#e8f4fd;color:var(--blue);padding:4px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;}
+  .qr-section{display:flex;flex-direction:column;align-items:center;gap:16px;}
+  #qrcode{padding:12px;background:#fff;border-radius:8px;box-shadow:0 0 0 1px #eee;}
+  .btn{padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-size:0.88rem;font-weight:600;transition:all .2s;text-decoration:none;display:inline-block;}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-outline{background:none;border:2px solid var(--blue);color:var(--blue);}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+  .url-box{font-family:monospace;font-size:0.82rem;background:#f0f4f8;padding:10px 14px;border-radius:6px;word-break:break-all;}
+  #qr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:100;justify-content:center;align-items:center;flex-direction:column;gap:20px;}
+  #qr-overlay.show{display:flex;}
+  #qr-big{background:#fff;padding:20px;border-radius:12px;}
+  #qr-overlay .close-btn{color:#fff;cursor:pointer;background:rgba(255,255,255,.15);border:none;padding:10px 24px;border-radius:8px;}
+  footer{text-align:center;padding:16px;font-size:0.75rem;color:var(--gray);}
+</style>
+</head>
+<body>
+<header>
+  <div class="icon">🖥️</div>
+  <div>
+    <h1>Schirmbild an Blenden</h1>
+    <div class="sub">Lehrer-Infoseite · Physik · Klasse 6 · Optik · physik_kl6_optik_schirmbild</div>
+  </div>
+</header>
+<main>
+  <div class="card">
+    <h2>📋 Metadaten</h2>
+    <div class="meta-grid">
+      <div class="meta-item"><div class="key">Fach</div><div class="val">Physik</div></div>
+      <div class="meta-item"><div class="key">Klassenstufe</div><div class="val">Klasse 6</div></div>
+      <div class="meta-item"><div class="key">Oberthema</div><div class="val">Optik</div></div>
+      <div class="meta-item"><div class="key">Thema</div><div class="val">Schirmbild an Blenden</div></div>
+      <div class="meta-item"><div class="key">Typ</div><div class="val">Schülerversuch</div></div>
+      <div class="meta-item"><div class="key">Dateiname</div><div class="val">physik_kl6_optik_schirmbild</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>📝 Kurzbeschreibung</h2>
+    <p style="font-size:0.9rem;line-height:1.7">Interaktive Simulation zum Schirmbild an Einzel- und Mehrfachblenden. Schüler beobachten, wie Randstrahlen auf einem senkrecht stehenden Schirm helle Streifen erzeugen. Die Sven-Aufgabe trainiert die Rückwärtskonstruktion zur Lichtquellenbestimmung. Ein Vergleichsmodus zeigt simultan den Einfluss verschiedener Spaltbreiten.</p>
+  </div>
+  <div class="card">
+    <h2>🎯 Lernziele</h2>
+    <ul>
+      <li>Schüler können das Schirmbild einer Einfachblende beschreiben und skizzieren.</li>
+      <li>Schüler erklären, warum ein Mehrfachspalt ein Streifenmuster erzeugt.</li>
+      <li>Schüler können durch Rückwärtskonstruktion eine Lichtquelle lokalisieren.</li>
+      <li>Schüler vergleichen den Einfluss von Spaltbreite und Schirmabstand auf den Lichtfleck.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>📚 Seiten der Simulation</h2>
+    <ol style="line-height:2.2">
+      <li><strong>Einfachspalt → Schirmbild:</strong> Spaltbreite und Schirmabstand variieren, Lichtfleck beobachten.</li>
+      <li><strong>Mehrfachspalt → Schirmbild:</strong> Anzahl/Breite/Abstand der Spalte, Streifenmuster erkunden.</li>
+      <li><strong>Sven-Aufgabe:</strong> Lichtquelle in Grundriss durch Rückwärtskonstruktion finden.</li>
+      <li><strong>Vergleich:</strong> Zwei Spaltbreiten gleichzeitig, Schirmabstand verstellbar.</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h2>🏷️ Tags</h2>
+    <div class="tags">
+      <span class="tag">Optik</span><span class="tag">Schirmbild</span>
+      <span class="tag">Lichtfleck</span><span class="tag">Blende</span>
+      <span class="tag">Mehrfachspalt</span><span class="tag">Randstrahlen</span>
+      <span class="tag">Konstruktion</span><span class="tag">Klasse 6</span>
+      <span class="tag">Schülerversuch</span><span class="tag">iPad</span>
+    </div>
+  </div>
+  <div class="card">
+    <h2>📱 QR-Code & Link</h2>
+    <div class="qr-section">
+      <div id="qrcode"></div>
+      <div class="url-box" id="sim-url"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="showQROverlay()">🔍 QR-Code groß</button>
+        <button class="btn btn-outline" onclick="printQR()">🖨️ Drucken</button>
+        <a class="btn btn-primary" id="sim-link" href="#" target="_blank">▶ Simulation</a>
+      </div>
+    </div>
+  </div>
+</main>
+<footer>Physik · Klasse 6 · Optik · physik_kl6_optik_schirmbild</footer>
+<div id="qr-overlay">
+  <div id="qr-big"></div>
+  <button class="close-btn" onclick="document.getElementById('qr-overlay').classList.remove('show')">✕ Schließen</button>
+</div>
+<script>
+const SIM_URL='https://semmikgs.github.io/mint-simulationen/physik/klasse-6/optik/schirmbild-blenden/physik_kl6_optik_schirmbild.html';
+document.getElementById('sim-url').textContent=SIM_URL;
+document.getElementById('sim-link').href=SIM_URL;
+new QRCode(document.getElementById('qrcode'),{text:SIM_URL,width:160,height:160,colorDark:'#1a1a2e',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+function showQROverlay(){document.getElementById('qr-big').innerHTML='';new QRCode(document.getElementById('qr-big'),{text:SIM_URL,width:300,height:300,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});document.getElementById('qr-overlay').classList.add('show');}
+function printQR(){const w=window.open('','_blank');const c=document.querySelector('#qrcode canvas');w.document.write(`<html><body style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column"><h2 style="font-family:Arial;margin-bottom:16px">Schirmbild an Blenden</h2><img src="${c.toDataURL()}" style="width:250px;height:250px"><p style="font-family:Arial;font-size:12px;margin-top:12px;color:#666">${SIM_URL}</p></body></html>`);w.print();}
+</script>
+</body>
+</html>
