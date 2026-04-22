@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Photosynthese – Simulation | Biologie Kl. 9/10</title>
+
+<!-- Metadaten -->
+<script type="application/json" id="sim-meta">
+{
+  "fach": "Biologie",
+  "klassenstufe": "9-10",
+  "oberthema": "Stoffwechsel",
+  "thema": "Photosynthese",
+  "typ": "Schülerversuch",
+  "lernziele": [
+    "Schüler kennen die Gleichung der Photosynthese",
+    "Schüler verstehen den Einfluss von Licht, CO₂ und Temperatur auf die O₂-Produktion",
+    "Schüler können Limiting-Faktor-Prinzip erklären"
+  ],
+  "tags": ["Photosynthese", "Stoffwechsel", "Chloroplast", "Licht", "CO2"],
+  "erstellt": "2026-04-22",
+  "autor": "semmikgs"
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --green-dark: #1a5c2a;
+    --green-mid: #2d8a45;
+    --green-light: #4caf6e;
+    --green-pale: #c8f0d3;
+    --sun-yellow: #f9c233;
+    --sky-blue: #d0eeff;
+    --text-dark: #1a2e1e;
+    --text-mid: #3a5a42;
+    --accent-orange: #e87c2a;
+    --white: #ffffff;
+    --radius: 16px;
+    --shadow: 0 4px 20px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(160deg, #e8f7ec 0%, #d0eeff 100%);
+    min-height: 100vh;
+    color: var(--text-dark);
+    padding: 12px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    color: white;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: var(--shadow);
+  }
+  .header-icon { font-size: 2.6rem; }
+  .header h1 { font-size: 1.45rem; font-weight: 800; line-height: 1.2; }
+  .header p { font-size: 0.82rem; opacity: 0.85; margin-top: 3px; }
+  .badge {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    margin-top: 5px;
+  }
+
+  /* ── Formel-Box ── */
+  .formel-box {
+    background: white;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    border-left: 5px solid var(--green-mid);
+    box-shadow: var(--shadow);
+  }
+  .formel-box h3 { font-size: 0.8rem; color: var(--text-mid); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .formel {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--green-dark);
+    font-weight: 700;
+    line-height: 1.6;
+  }
+  .formel .highlight { color: var(--accent-orange); }
+  .formel .arrow { color: var(--green-mid); }
+
+  /* ── Lernziele ── */
+  .lernziele {
+    background: var(--green-pale);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .lernziele h3 { font-size: 0.8rem; color: var(--green-dark); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .lernziele ul { list-style: none; }
+  .lernziele li { font-size: 0.88rem; padding: 3px 0; display: flex; align-items: flex-start; gap: 8px; }
+  .lernziele li::before { content: "✓"; color: var(--green-mid); font-weight: 800; flex-shrink: 0; }
+
+  /* ── Simulation-Layout: Slider links | Canvas rechts ── */
+  .sim-layout {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: stretch;
+  }
+  @media (max-width: 600px) {
+    .sim-layout { grid-template-columns: 1fr; }
+    .sim-right { flex-direction: column !important; }
+  }
+
+  /* Linke Spalte */
+  .sim-left { display: flex; flex-direction: column; gap: 8px; }
+  .sim-left .slider-panel { flex: 1; }
+
+  /* Rechte Spalte: Pflanze + Diagramm nebeneinander */
+  .sim-right { display: flex; flex-direction: row; gap: 10px; }
+
+  /* ── Canvas-Card ── */
+  .canvas-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 10px;
+    box-shadow: var(--shadow);
+    border: 1.5px solid #e8f0ea;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+  }
+  .canvas-card h3 {
+    font-size: 0.75rem; color: var(--text-mid); font-weight: 700;
+    margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+    align-self: flex-start;
+  }
+  #plant-canvas, #chart-canvas { border-radius: 8px; width: 100% !important; height: auto !important; display: block; }
+
+  /* ── Slider-Panel (kompakt) ── */
+  .slider-panel {
+    background: white;
+    border-radius: var(--radius);
+    padding: 12px;
+    box-shadow: var(--shadow);
+  }
+  .slider-panel h3 { font-size: 0.75rem; color: var(--text-mid); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+
+  .slider-group { margin-bottom: 10px; }
+  .slider-group:last-child { margin-bottom: 0; }
+
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .slider-label span { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); }
+  .slider-value {
+    background: var(--green-pale);
+    color: var(--green-dark);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    min-width: 50px;
+    text-align: center;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+
+  /* Individuelle Farben */
+  #slider-light { background: linear-gradient(to right, #555, #f9c233); }
+  #slider-light::-webkit-slider-thumb { background: var(--sun-yellow); border: 3px solid #e6a800; }
+  #slider-co2 { background: linear-gradient(to right, #ddd, #4caf6e); }
+  #slider-co2::-webkit-slider-thumb { background: var(--green-light); border: 3px solid var(--green-mid); }
+  #slider-temp { background: linear-gradient(to right, #90caf9, #ef5350); }
+  #slider-temp::-webkit-slider-thumb { background: #ef5350; border: 3px solid #c62828; }
+
+  .slider-hint { font-size: 0.67rem; color: #aaa; margin-top: 2px; }
+
+  /* ── O₂-Rate-Anzeige (kompakt) ── */
+  .rate-display {
+    background: linear-gradient(135deg, var(--green-mid), var(--green-dark));
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+  }
+  .rate-label { font-size: 0.75rem; font-weight: 700; opacity: 0.9; }
+  .rate-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .rate-unit { font-size: 0.65rem; opacity: 0.8; }
+
+  /* ── Erklärungs-Box ── */
+  .erklaer-box {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .erklaer-box h3 { font-size: 0.82rem; color: var(--text-mid); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .erklaer-box p { font-size: 0.88rem; line-height: 1.6; color: var(--text-dark); margin-bottom: 8px; }
+  .erklaer-box p:last-child { margin-bottom: 0; }
+  .erklaer-box strong { color: var(--green-dark); }
+  .limiting-info {
+    background: #fff8e1;
+    border-left: 4px solid var(--sun-yellow);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    font-size: 0.85rem;
+  }
+
+  /* ── Quiz ── */
+  .quiz-section {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .quiz-section h3 { font-size: 0.82rem; color: var(--text-mid); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+
+  .quiz-question { margin-bottom: 20px; }
+  .quiz-question:last-child { margin-bottom: 0; }
+  .quiz-q { font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+  .quiz-q .qnum { color: var(--green-mid); }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 6px; }
+  .quiz-option {
+    background: #f5f5f5;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    color: var(--text-dark);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .quiz-option:active { transform: scale(0.98); }
+  .quiz-option.correct { background: #e8f5e9; border-color: var(--green-mid); color: var(--green-dark); }
+  .quiz-option.wrong { background: #ffebee; border-color: #ef5350; color: #c62828; }
+  .quiz-option.disabled { pointer-events: none; }
+  .quiz-feedback {
+    font-size: 0.83rem;
+    margin-top: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: none;
+    font-weight: 600;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: #e8f5e9; color: var(--green-dark); }
+  .quiz-feedback.wrong { background: #ffebee; color: #c62828; }
+
+  .quiz-score {
+    background: var(--green-pale);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    margin-top: 14px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--green-dark);
+    display: none;
+  }
+  .quiz-score.show { display: block; }
+
+  /* ── QR-Code ── */
+  .qr-section {
+    background: white;
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .qr-section h3 { font-size: 0.82rem; color: var(--text-mid); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .qr-section p { font-size: 0.78rem; color: #888; margin-bottom: 14px; }
+  #qrcode { display: inline-block; }
+  #qrcode canvas, #qrcode img { border-radius: 8px; border: 3px solid var(--green-pale); }
+  .qr-url {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-mid);
+    word-break: break-all;
+    margin-top: 10px;
+    background: #f5f5f5;
+    padding: 8px;
+    border-radius: 8px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-mid);
+    padding: 8px;
+    opacity: 0.7;
+  }
+
+  /* ── Accessibility ── */
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+  :focus-visible { outline: 3px solid var(--green-mid); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header" role="banner">
+  <div class="header-icon" aria-hidden="true">🌿</div>
+  <div>
+    <h1>Photosynthese</h1>
+    <p>Interaktiver Schülerversuch</p>
+    <span class="badge">Biologie · Klasse 9/10</span>
+  </div>
+</div>
+
+<!-- Reaktionsgleichung -->
+<div class="formel-box" role="region" aria-label="Reaktionsgleichung">
+  <h3>Reaktionsgleichung der Photosynthese</h3>
+  <div class="formel">
+    6 CO₂ + 6 H₂O <span class="highlight">+ Licht</span> <span class="arrow">→</span><br>
+    C₆H₁₂O₆ + 6 <span class="highlight">O₂</span>
+  </div>
+</div>
+
+<!-- Lernziele -->
+<div class="lernziele" role="region" aria-label="Lernziele">
+  <h3>🎯 Lernziele</h3>
+  <ul>
+    <li>Ich kenne die Reaktionsgleichung der Photosynthese</li>
+    <li>Ich erkläre den Einfluss von Licht, CO₂ und Temperatur auf die O₂-Produktion</li>
+    <li>Ich kann das Konzept des <strong>limitierenden Faktors</strong> anwenden</li>
+  </ul>
+</div>
+
+<!-- Simulation-Layout: Slider links | Canvas rechts -->
+<div class="sim-layout">
+
+  <!-- LINKS: Slider + O₂-Rate -->
+  <div class="sim-left">
+    <div class="slider-panel" role="region" aria-label="Parameter">
+      <h3>⚙️ Parameter</h3>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>☀️ Licht</span>
+          <span class="slider-value" id="val-light">50 %</span>
+        </div>
+        <input type="range" id="slider-light" min="0" max="100" value="50"
+               aria-label="Lichtintensität" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+        <div class="slider-hint">0 % dunkel · 100 % Sonne</div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🌬️ CO₂</span>
+          <span class="slider-value" id="val-co2">50 %</span>
+        </div>
+        <input type="range" id="slider-co2" min="0" max="100" value="50"
+               aria-label="CO2-Konzentration" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+        <div class="slider-hint">0 % kein CO₂ · 100 % optimal</div>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🌡️ Temp.</span>
+          <span class="slider-value" id="val-temp">25 °C</span>
+        </div>
+        <input type="range" id="slider-temp" min="0" max="45" value="25"
+               aria-label="Temperatur" aria-valuemin="0" aria-valuemax="45" aria-valuenow="25">
+        <div class="slider-hint">Optimum ~25 °C</div>
+      </div>
+    </div>
+
+    <div class="rate-display" role="status" aria-live="polite" aria-label="Sauerstoffproduktionsrate">
+      <div>
+        <div class="rate-label">O₂-Produktion</div>
+        <div class="rate-unit">rel. E. / min</div>
+      </div>
+      <div class="rate-value" id="o2-rate">0.0</div>
+    </div>
+  </div>
+
+  <!-- RECHTS: Pflanze oben, Diagramm unten -->
+  <div class="sim-right">
+    <div class="canvas-card" role="region" aria-label="Pflanzen-Animation">
+      <h3>🌱 Pflanze</h3>
+      <div id="plant-canvas"></div>
+    </div>
+    <div class="canvas-card" role="region" aria-label="Balkendiagramm O2-Produktion">
+      <h3>📊 O₂-Verlauf</h3>
+      <div id="chart-canvas"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Erklärtext -->
+<div class="erklaer-box" role="region" aria-label="Erklärung">
+  <h3>📖 Wie funktioniert Photosynthese?</h3>
+  <p>Pflanzen nehmen <strong>Kohlenstoffdioxid (CO₂)</strong> über Spaltöffnungen auf und <strong>Wasser (H₂O)</strong> über die Wurzeln. In den <strong>Chloroplasten</strong> wird mit Hilfe von Licht Glucose (C₆H₁₂O₆) hergestellt — und <strong>Sauerstoff (O₂)</strong> wird freigesetzt.</p>
+  <p>Die Geschwindigkeit der Photosynthese hängt von mehreren Faktoren ab. Ist einer davon zu niedrig, begrenzt er den gesamten Prozess — man spricht vom <strong>limitierenden Faktor</strong>.</p>
+  <div class="limiting-info" role="note">
+    💡 <strong>Limitierender Faktor:</strong> Selbst bei viel Licht und optimaler Temperatur kann die O₂-Produktion gering bleiben — wenn <strong>CO₂ fehlt</strong>. Versuche, alle drei Faktoren gleichzeitig zu optimieren!
+  </div>
+</div>
+
+<!-- Quiz -->
+<div class="quiz-section" role="region" aria-label="Quiz">
+  <h3>🧠 Teste dein Wissen</h3>
+
+  <div class="quiz-question" id="q1">
+    <div class="quiz-q"><span class="qnum">1.</span> Welches Gas wird bei der Photosynthese freigesetzt?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" data-q="1" data-correct="false" onclick="checkAnswer(this)">Kohlenstoffdioxid (CO₂)</button>
+      <button class="quiz-option" data-q="1" data-correct="true"  onclick="checkAnswer(this)">Sauerstoff (O₂)</button>
+      <button class="quiz-option" data-q="1" data-correct="false" onclick="checkAnswer(this)">Stickstoff (N₂)</button>
+    </div>
+    <div class="quiz-feedback" id="fb1"></div>
+  </div>
+
+  <div class="quiz-question" id="q2">
+    <div class="quiz-q"><span class="qnum">2.</span> Was passiert bei 42 °C mit der Photosyntheserate?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" data-q="2" data-correct="false" onclick="checkAnswer(this)">Sie steigt stark an</button>
+      <button class="quiz-option" data-q="2" data-correct="false" onclick="checkAnswer(this)">Sie bleibt gleich</button>
+      <button class="quiz-option" data-q="2" data-correct="true"  onclick="checkAnswer(this)">Sie sinkt, weil Enzyme denaturieren</button>
+    </div>
+    <div class="quiz-feedback" id="fb2"></div>
+  </div>
+
+  <div class="quiz-question" id="q3">
+    <div class="quiz-q"><span class="qnum">3.</span> Was ist ein „limitierender Faktor"?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" data-q="3" data-correct="false" onclick="checkAnswer(this)">Der Faktor mit dem höchsten Wert</button>
+      <button class="quiz-option" data-q="3" data-correct="true"  onclick="checkAnswer(this)">Der Faktor, der die Reaktionsrate am meisten einschränkt</button>
+      <button class="quiz-option" data-q="3" data-correct="false" onclick="checkAnswer(this)">Die maximale Temperatur für Enzyme</button>
+    </div>
+    <div class="quiz-feedback" id="fb3"></div>
+  </div>
+
+  <div class="quiz-score" id="quiz-score"></div>
+</div>
+
+<!-- QR-Code -->
+<div class="qr-section" role="region" aria-label="QR-Code zur Simulation">
+  <h3>📱 Direkt öffnen</h3>
+  <p>QR-Code scannen, um die Simulation auf dem iPad zu öffnen</p>
+  <div id="qrcode"></div>
+  <div class="qr-url">https://semmikgs.github.io/mint-simulationen/biologie/klasse-910/photosynthese/simulation.html</div>
+</div>
+
+<!-- Footer -->
+<div class="footer" role="contentinfo">
+  Biologie · Klasse 9/10 · Schülerversuch · KGS Schwarmstedt · Herr Semrau
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const state = {
+  light: 50,
+  co2: 50,
+  temp: 25,
+  o2Rate: 0,
+  history: []
+};
+
+// O₂-Rate berechnen (biologisch plausibles Modell)
+function calcO2Rate(light, co2, temp) {
+  // Licht: linearer Anstieg bis ~80, dann Plateau (Lichtsättigung)
+  const lightFactor = light < 80 ? light / 80 : 1.0;
+
+  // CO₂: Michaelis-Menten-ähnlich
+  const co2Factor = co2 / (co2 + 20);
+
+  // Temperatur: Optimumkurve ~25°C, Einbruch >38°C (Enzymadenaturierung)
+  let tempFactor;
+  if (temp <= 0) {
+    tempFactor = 0.02;
+  } else if (temp <= 25) {
+    tempFactor = 0.05 + 0.95 * (temp / 25);
+  } else if (temp <= 38) {
+    tempFactor = 1.0 - 0.3 * ((temp - 25) / 13);
+  } else {
+    tempFactor = 0.7 * Math.max(0, 1 - (temp - 38) / 7);
+  }
+
+  // Limitierender Faktor: Minimum bestimmt das Ergebnis
+  const rate = 10 * Math.min(lightFactor, co2Factor) * tempFactor;
+  return Math.max(0, Math.round(rate * 10) / 10);
+}
+
+// ═══════════════════════════════════════════
+// SLIDER LOGIC
+// ═══════════════════════════════════════════
+const sliderLight = document.getElementById('slider-light');
+const sliderCo2   = document.getElementById('slider-co2');
+const sliderTemp  = document.getElementById('slider-temp');
+
+function updateAll() {
+  state.light = +sliderLight.value;
+  state.co2   = +sliderCo2.value;
+  state.temp  = +sliderTemp.value;
+  state.o2Rate = calcO2Rate(state.light, state.co2, state.temp);
+
+  document.getElementById('val-light').textContent = state.light + ' %';
+  document.getElementById('val-co2').textContent   = state.co2 + ' %';
+  document.getElementById('val-temp').textContent  = state.temp + ' °C';
+  document.getElementById('o2-rate').textContent   = state.o2Rate.toFixed(1);
+
+  sliderLight.setAttribute('aria-valuenow', state.light);
+  sliderCo2.setAttribute('aria-valuenow', state.co2);
+  sliderTemp.setAttribute('aria-valuenow', state.temp);
+
+  // History für Balkendiagramm
+  state.history.push(state.o2Rate);
+  if (state.history.length > 20) state.history.shift();
+}
+
+sliderLight.addEventListener('input', function() {
+  state.light = +sliderLight.value;
+  state.co2   = +sliderCo2.value;
+  state.temp  = +sliderTemp.value;
+  state.o2Rate = calcO2Rate(state.light, state.co2, state.temp);
+  document.getElementById('val-light').textContent = state.light + ' %';
+  document.getElementById('val-co2').textContent   = state.co2 + ' %';
+  document.getElementById('val-temp').textContent  = state.temp + ' °C';
+  document.getElementById('o2-rate').textContent   = state.o2Rate.toFixed(1);
+  sliderLight.setAttribute('aria-valuenow', state.light);
+  sliderCo2.setAttribute('aria-valuenow', state.co2);
+  sliderTemp.setAttribute('aria-valuenow', state.temp);
+});
+sliderCo2.addEventListener('input', function() { sliderLight.dispatchEvent(new Event('input')); });
+sliderTemp.addEventListener('input', function() { sliderLight.dispatchEvent(new Event('input')); });
+
+// Auto-push history alle 2 Sekunden
+setInterval(function() {
+  state.history.push(state.o2Rate);
+  if (state.history.length > 20) state.history.shift();
+}, 2000);
+
+updateAll();
+
+// ═══════════════════════════════════════════
+// P5.JS – PFLANZENSIMULATION
+// ═══════════════════════════════════════════
+new p5(function(p) {
+  const bubbles = [];
+  const photons = [];
+  const CO2particles = [];
+
+  p.setup = function() {
+    const cnv = p.createCanvas(300, 280);
+    cnv.parent('plant-canvas');
+    p.frameRate(30);
+  };
+
+  // Blatt-Shape
+  function drawLeaf(x, y, w, h, angle, col) {
+    p.push();
+    p.translate(x, y);
+    p.rotate(angle);
+    p.fill(col);
+    p.noStroke();
+    p.beginShape();
+    p.vertex(0, 0);
+    p.bezierVertex(-w*0.5, -h*0.3, -w*0.4, -h*0.9, 0, -h);
+    p.bezierVertex(w*0.4, -h*0.9, w*0.5, -h*0.3, 0, 0);
+    p.endShape(p.CLOSE);
+    // Mittelrippe
+    p.stroke(p.lerpColor(col, p.color(20,80,20), 0.5));
+    p.strokeWeight(1.5);
+    p.line(0, 0, 0, -h*0.85);
+    p.pop();
+  }
+
+  p.draw = function() {
+    const rate = state.o2Rate;
+    const lightPct = state.light / 100;
+    const co2Pct = state.co2 / 100;
+
+    // Himmel-Gradient
+    const skyTop = p.lerpColor(p.color(30,30,50), p.color(135,206,250), lightPct);
+    const skyBot = p.lerpColor(p.color(50,50,70), p.color(200,230,255), lightPct);
+    for (let y = 0; y < p.height; y++) {
+      p.stroke(p.lerpColor(skyTop, skyBot, y/p.height));
+      p.line(0, y, p.width, y);
+    }
+    p.noStroke();
+
+    // Boden
+    p.fill(90, 55, 30);
+    p.rect(0, p.height - 35, p.width, 35);
+    p.fill(60, 120, 40);
+    p.ellipse(p.width/2, p.height - 35, p.width*1.1, 30);
+
+    // Sonne
+    if (lightPct > 0.05) {
+      const sunAlpha = p.map(lightPct, 0.05, 1, 50, 255);
+      const sunSize = p.map(lightPct, 0, 1, 20, 55);
+      p.fill(249, 194, 51, sunAlpha * 0.3);
+      p.circle(60, 45, sunSize * 2.4);
+      p.fill(249, 194, 51, sunAlpha * 0.6);
+      p.circle(60, 45, sunSize * 1.5);
+      p.fill(255, 220, 80, sunAlpha);
+      p.circle(60, 45, sunSize);
+
+      // Lichtstrahlen
+      if (lightPct > 0.2 && p.frameCount % 4 === 0) {
+        photons.push({ x: 60 + p.random(-10, 10), y: 45, vx: p.random(-0.5,0.5), vy: p.random(2,4), life: 1 });
+      }
+    }
+
+    // Photonen animieren
+    for (let i = photons.length - 1; i >= 0; i--) {
+      const ph = photons[i];
+      ph.x += ph.vx; ph.y += ph.vy; ph.life -= 0.03;
+      if (ph.life <= 0 || ph.y > p.height * 0.65) { photons.splice(i, 1); continue; }
+      p.fill(255, 230, 80, ph.life * 200);
+      p.circle(ph.x, ph.y, 5);
+    }
+
+    // CO₂-Partikel
+    if (co2Pct > 0.1 && p.frameCount % 8 === 0) {
+      CO2particles.push({ x: p.random(20, p.width-20), y: p.height - 30, vy: p.random(-1,-0.4), life: 1 });
+    }
+    for (let i = CO2particles.length - 1; i >= 0; i--) {
+      const cp = CO2particles[i];
+      cp.y += cp.vy; cp.life -= 0.015;
+      if (cp.life <= 0) { CO2particles.splice(i, 1); continue; }
+      p.fill(150, 200, 255, cp.life * 180);
+      p.textSize(9);
+      p.noStroke();
+      p.textAlign(p.CENTER);
+      p.text('CO₂', cp.x, cp.y);
+    }
+
+    // Stamm
+    const trunkGreen = p.map(rate, 0, 10, 80, 140);
+    p.fill(60, 40, 20);
+    p.rect(p.width/2 - 6, p.height*0.45, 12, p.height*0.55 - 35);
+
+    // Blätter — Grünton abhängig von Rate
+    const leafG = p.map(rate, 0, 10, 90, 180);
+    const leafCol = p.color(30, leafG, 50);
+
+    drawLeaf(p.width/2 - 5, p.height*0.52, 55, 70, -0.5, leafCol);
+    drawLeaf(p.width/2 + 5, p.height*0.46, 60, 75, 0.4, p.lerpColor(leafCol, p.color(50,200,70), 0.1));
+    drawLeaf(p.width/2, p.height*0.38, 50, 65, 0.0, p.lerpColor(leafCol, p.color(40,190,60), 0.15));
+    drawLeaf(p.width/2 - 8, p.height*0.35, 45, 55, -0.6, leafCol);
+    drawLeaf(p.width/2 + 6, p.height*0.30, 40, 55, 0.7, leafCol);
+
+    // O₂-Blasen
+    if (rate > 0.5 && p.frameCount % Math.max(2, Math.floor(12 - rate)) === 0) {
+      bubbles.push({
+        x: p.width/2 + p.random(-45, 45),
+        y: p.height*0.38,
+        r: p.random(4, 9),
+        vy: p.random(-1.2, -0.6),
+        life: 1
+      });
+    }
+    for (let i = bubbles.length - 1; i >= 0; i--) {
+      const b = bubbles[i];
+      b.y += b.vy; b.life -= 0.018; b.x += p.sin(p.frameCount * 0.1 + i) * 0.4;
+      if (b.life <= 0) { bubbles.splice(i, 1); continue; }
+      p.fill(180, 240, 200, b.life * 200);
+      p.stroke(100, 200, 130, b.life * 150);
+      p.strokeWeight(1);
+      p.circle(b.x, b.y, b.r * 2);
+      p.noStroke();
+      p.fill(255, 255, 255, b.life * 80);
+      p.circle(b.x - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.6);
+    }
+
+    // Rate-Label
+    p.noStroke();
+    p.fill(255, 255, 255, 200);
+    p.rect(6, 6, 105, 24, 8);
+    p.fill(30, 100, 50);
+    p.textSize(11);
+    p.textAlign(p.LEFT);
+    p.text('O₂: ' + rate.toFixed(1) + ' rel. E/min', 12, 22);
+  };
+}, document.getElementById('plant-canvas'));
+
+// ═══════════════════════════════════════════
+// P5.JS – BALKENDIAGRAMM
+// ═══════════════════════════════════════════
+new p5(function(p) {
+  p.setup = function() {
+    const cnv = p.createCanvas(300, 280);
+    cnv.parent('chart-canvas');
+    p.frameRate(10);
+  };
+
+  p.draw = function() {
+    p.background(248, 252, 248);
+
+    const hist = state.history;
+    const maxBars = 18;
+    const display = hist.slice(-maxBars);
+    const maxVal = 10;
+    const pad = { l: 42, r: 10, t: 20, b: 36 };
+    const chartW = p.width - pad.l - pad.r;
+    const chartH = p.height - pad.t - pad.b;
+    const barW = chartW / maxBars;
+
+    // Gitternetz
+    p.stroke(220);
+    p.strokeWeight(1);
+    for (let v = 0; v <= 10; v += 2) {
+      const yy = pad.t + chartH - (v / maxVal) * chartH;
+      p.line(pad.l, yy, pad.l + chartW, yy);
+    }
+
+    // Achsen
+    p.stroke(100);
+    p.strokeWeight(2);
+    p.line(pad.l, pad.t, pad.l, pad.t + chartH);
+    p.line(pad.l, pad.t + chartH, pad.l + chartW, pad.t + chartH);
+
+    // Y-Achse Labels
+    p.noStroke();
+    p.fill(80);
+    p.textSize(9);
+    p.textAlign(p.RIGHT);
+    for (let v = 0; v <= 10; v += 2) {
+      const yy = pad.t + chartH - (v / maxVal) * chartH;
+      p.text(v, pad.l - 4, yy + 3);
+    }
+
+    // Achsenbeschriftung
+    p.textAlign(p.CENTER);
+    p.fill(60, 100, 70);
+    p.textSize(10);
+    p.push();
+    p.translate(12, pad.t + chartH / 2);
+    p.rotate(-p.HALF_PI);
+    p.text('O₂ (rel.)', 0, 0);
+    p.pop();
+    p.text('Zeit →', pad.l + chartW / 2, p.height - 6);
+
+    // Balken
+    for (let i = 0; i < display.length; i++) {
+      const val = display[i];
+      const bh = (val / maxVal) * chartH;
+      const bx = pad.l + i * barW;
+      const by = pad.t + chartH - bh;
+
+      // Farbe nach Rate
+      const r = p.map(val, 0, 10, 180, 30);
+      const g = p.map(val, 0, 10, 60, 180);
+      p.fill(r, g, 70, 220);
+      p.noStroke();
+      p.rect(bx + 2, by, barW - 4, bh, 3, 3, 0, 0);
+
+      // Wert oben drauf (nur wenn breit genug)
+      if (val > 0.5) {
+        p.fill(60, 100, 60);
+        p.textSize(8);
+        p.textAlign(p.CENTER);
+        p.text(val.toFixed(1), bx + barW/2, by - 3);
+      }
+    }
+
+    // Aktueller Wert hervorgehoben
+    if (display.length > 0) {
+      const last = display[display.length - 1];
+      const bh = (last / maxVal) * chartH;
+      const bx = pad.l + (display.length - 1) * barW;
+      const by = pad.t + chartH - bh;
+      p.fill(50, 200, 100, 80);
+      p.noStroke();
+      p.rect(bx + 1, by - 2, barW - 2, bh + 2, 3, 3, 0, 0);
+    }
+
+    // Titel
+    p.fill(40, 80, 50);
+    p.textSize(10);
+    p.textAlign(p.CENTER);
+    p.text('Sauerstoff-Produktion (letzte Messungen)', p.width/2, 13);
+  };
+}, document.getElementById('chart-canvas'));
+
+// ═══════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════
+const feedbacks = {
+  1: { c: '✅ Richtig! Sauerstoff (O₂) ist das Nebenprodukt der Photosynthese.', w: '❌ Falsch. CO₂ wird verbraucht, nicht produziert. Sauerstoff (O₂) wird freigesetzt.' },
+  2: { c: '✅ Richtig! Über ~38 °C denaturieren die Enzyme in den Chloroplasten.', w: '❌ Nicht richtig. Sehr hohe Temperaturen zerstören die Enzyme – die Rate sinkt.' },
+  3: { c: '✅ Richtig! Der limitierende Faktor ist der knappste Faktor — er begrenzt die Gesamtrate.', w: '❌ Falsch. Der limitierende Faktor ist der Faktor, der die Reaktion am stärksten einschränkt.' }
+};
+
+const answered = {};
+
+function checkAnswer(btn) {
+  const q = btn.dataset.q;
+  if (answered[q]) return;
+  answered[q] = true;
+
+  const allBtns = document.querySelectorAll(`[data-q="${q}"]`);
+  allBtns.forEach(b => b.classList.add('disabled'));
+
+  const correct = btn.dataset.correct === 'true';
+  btn.classList.add(correct ? 'correct' : 'wrong');
+
+  // Korrekte Antwort zeigen
+  if (!correct) {
+    allBtns.forEach(b => { if (b.dataset.correct === 'true') b.classList.add('correct'); });
+  }
+
+  const fb = document.getElementById('fb' + q);
+  fb.textContent = correct ? feedbacks[q].c : feedbacks[q].w;
+  fb.className = 'quiz-feedback show ' + (correct ? 'correct' : 'wrong');
+
+  // Score wenn alle beantwortet
+  if (Object.keys(answered).length === 3) {
+    const score = Object.values(answered).filter(Boolean).length; // always true if answered
+    const points = [1,2,3].filter(n => {
+      const correctBtn = document.querySelector(`[data-q="${n}"][data-correct="true"]`);
+      return correctBtn && correctBtn.classList.contains('correct') &&
+             !document.querySelector(`[data-q="${n}"][data-correct="false"].correct`);
+    });
+    const pts = [1,2,3].reduce((acc, n) => {
+      const userBtn = Array.from(document.querySelectorAll(`[data-q="${n}"].correct`));
+      // Check if the user clicked the correct one (not just shown correct)
+      return acc;
+    }, 0);
+
+    // Zähle korrekte Antworten
+    let correct_count = 0;
+    [1,2,3].forEach(n => {
+      const correctBtn = document.querySelector(`[data-q="${n}"][data-correct="true"]`);
+      const wrongBtns = document.querySelectorAll(`[data-q="${n}"][data-correct="false"].wrong`);
+      if (correctBtn.classList.contains('correct') && wrongBtns.length === 0) correct_count++;
+    });
+
+    const scoreDiv = document.getElementById('quiz-score');
+    const msgs = ['Noch üben – schau dir die Erklärungen an! 💪', 'Gut gemacht – fast richtig! 👍', 'Super – alles richtig! 🎉'];
+    scoreDiv.textContent = `Ergebnis: ${correct_count}/3 richtig — ${msgs[correct_count] || msgs[0]}`;
+    scoreDiv.classList.add('show');
+  }
+}
+
+// ═══════════════════════════════════════════
+// QR-CODE
+// ═══════════════════════════════════════════
+window.addEventListener('load', function() {
+  const url = 'https://semmikgs.github.io/mint-simulationen/biologie/klasse-910/photosynthese/simulation.html';
+  new QRCode(document.getElementById('qrcode'), {
+    text: url,
+    width: 160,
+    height: 160,
+    colorDark: '#1a5c2a',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+});
+</script>
+</body>
+</html>
