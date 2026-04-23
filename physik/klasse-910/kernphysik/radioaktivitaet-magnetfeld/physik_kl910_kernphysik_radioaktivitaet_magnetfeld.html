@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Radioaktive Strahlung im Magnetfeld | Physik Kl. 9/10</title>
+
+<script type="application/json" id="sim-meta">
+{
+  "fach": "Physik",
+  "klassenstufe": "9-10",
+  "oberthema": "Kern- und Atomphysik",
+  "thema": "Radioaktive Strahlung im Magnetfeld",
+  "typ": "Schülerversuch",
+  "lernziele": [
+    "Schüler kennen die drei Strahlungsarten α, β, γ und ihre Ladungen",
+    "Schüler verstehen, warum geladene Teilchen im Magnetfeld abgelenkt werden (Lorentzkraft)",
+    "Schüler können die Ablenkungsrichtung mit der Drei-Finger-Regel bestimmen",
+    "Schüler unterscheiden die Strahlungsarten anhand ihrer Ablenkung"
+  ],
+  "tags": ["Radioaktivität", "Magnetfeld", "Lorentzkraft", "Alpha", "Beta", "Gamma", "Kernphysik"],
+  "erstellt": "2026-04-23",
+  "autor": "semmikgs"
+}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f1923;
+  --surface: #1a2535;
+  --surface2: #212f42;
+  --border: #2a3f58;
+  --text: #e8f0f8;
+  --mid: #7a9ab8;
+  --alpha: #ff6b35;
+  --beta-p: #4fc3f7;
+  --beta-m: #ab47bc;
+  --gamma: #69f0ae;
+  --magnet-n: #ef5350;
+  --magnet-s: #42a5f5;
+  --gelb: #ffd54f;
+  --radius: 16px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 10px;
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #0d1f33 0%, #1a3a5c 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 14px;
+  box-shadow: var(--shadow);
+}
+.header-icon { font-size: 2.4rem; }
+.header h1 { font-size: 1.3rem; font-weight: 900; color: var(--text); }
+.header p  { font-size: 0.8rem; color: var(--mid); margin-top: 2px; }
+.badge {
+  display: inline-block;
+  background: rgba(79,195,247,0.15);
+  border: 1px solid rgba(79,195,247,0.3);
+  border-radius: 20px; padding: 2px 10px;
+  font-size: 0.72rem; font-weight: 700; margin-top: 4px;
+  color: var(--beta-p);
+}
+
+/* ── Aufgabe ── */
+.aufgabe {
+  background: rgba(255,213,79,0.08);
+  border-left: 4px solid var(--gelb);
+  border-radius: var(--radius);
+  padding: 11px 15px;
+  margin-bottom: 10px;
+  font-size: 0.88rem;
+  color: #f0d88a;
+  font-weight: 700;
+}
+.aufgabe span { display: block; font-weight: 400; font-size: 0.82rem; margin-top: 4px; color: #c8b870; }
+
+/* ── Haupt-Layout ── */
+.sim-layout {
+  display: grid;
+  grid-template-columns: 185px 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: start;
+}
+@media (max-width: 600px) { .sim-layout { grid-template-columns: 1fr; } }
+
+/* ── Control-Panel ── */
+.control-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 12px;
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.cp-title {
+  font-size: 0.72rem; font-weight: 900; text-transform: uppercase;
+  letter-spacing: 0.7px; color: var(--mid);
+}
+
+/* Strahlungsart-Buttons */
+.strahlen-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+}
+.strahlen-grid .btn-gamma { grid-column: 1 / -1; }
+
+.sBtn {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 6px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.82rem; font-weight: 800;
+  cursor: pointer; text-align: center;
+  color: var(--mid);
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.sBtn:active { transform: scale(0.96); }
+.sBtn.active-alpha  { border-color: var(--alpha);  color: var(--alpha);  background: rgba(255,107,53,0.12); }
+.sBtn.active-betap  { border-color: var(--beta-p); color: var(--beta-p); background: rgba(79,195,247,0.12); }
+.sBtn.active-betam  { border-color: var(--beta-m); color: var(--beta-m); background: rgba(171,71,188,0.12); }
+.sBtn.active-gamma  { border-color: var(--gamma);  color: var(--gamma);  background: rgba(105,240,174,0.12); }
+
+/* Magnetfeld-Toggle */
+.mag-toggle {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.mag-label { font-size: 0.72rem; font-weight: 700; color: var(--mid); }
+.mag-btns  { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+.mBtn {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 4px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.75rem; font-weight: 800;
+  cursor: pointer; text-align: center; color: var(--mid);
+  -webkit-tap-highlight-color: transparent;
+}
+.mBtn.active-up   { border-color: var(--magnet-n); color: var(--magnet-n); background: rgba(239,83,80,0.12); }
+.mBtn.active-down { border-color: var(--magnet-s); color: var(--magnet-s); background: rgba(66,165,245,0.12); }
+.mBtn.active-off  { border-color: #555; color: #888; background: rgba(80,80,80,0.12); }
+
+/* Info-Kacheln */
+.info-stack { display: flex; flex-direction: column; gap: 6px; }
+.info-kachel {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.ik-label { font-size: 0.68rem; color: var(--mid); font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+.ik-wert  { font-family: 'Space Mono', monospace; font-size: 0.88rem; font-weight: 700; margin-top: 2px; }
+.ik-alpha  { color: var(--alpha); }
+.ik-betap  { color: var(--beta-p); }
+.ik-betam  { color: var(--beta-m); }
+.ik-gamma  { color: var(--gamma); }
+.ik-neutral { color: var(--mid); }
+
+/* ── Canvas Card ── */
+.canvas-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  box-shadow: var(--shadow);
+}
+.canvas-card h3 {
+  font-size: 0.72rem; font-weight: 900; text-transform: uppercase;
+  letter-spacing: 0.6px; color: var(--mid); margin-bottom: 8px;
+}
+#sim-canvas { border-radius: 10px; width: 100% !important; height: auto !important; display: block; }
+
+/* ── Theorie-Grid ── */
+.theorie-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+@media (max-width: 540px) { .theorie-grid { grid-template-columns: 1fr; } }
+
+.theorie-kachel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+}
+.tk-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px;
+}
+.tk-dot {
+  width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+}
+.tk-titel { font-size: 0.82rem; font-weight: 900; }
+.tk-text  { font-size: 0.82rem; line-height: 1.55; color: #b0c8e0; }
+.tk-text strong { font-weight: 800; }
+
+/* Drei-Finger Merkhilfe */
+.finger-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 13px 15px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+}
+.finger-box h3 { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: var(--mid); margin-bottom: 10px; }
+.finger-row {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.finger-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 8px;
+  text-align: center;
+}
+.fi-emoji { font-size: 1.6rem; display: block; margin-bottom: 4px; }
+.fi-label { font-size: 0.72rem; font-weight: 800; color: var(--mid); text-transform: uppercase; letter-spacing: 0.4px; }
+.fi-text  { font-size: 0.78rem; font-weight: 700; margin-top: 2px; }
+.fi-daumen { color: #ffd54f; }
+.fi-zeige  { color: var(--magnet-n); }
+.fi-mittel { color: var(--alpha); }
+
+/* ── Quiz ── */
+.quiz-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+}
+.quiz-section h3 { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: var(--mid); margin-bottom: 12px; }
+.qfrage { margin-bottom: 16px; }
+.qfrage:last-of-type { margin-bottom: 0; }
+.qtext { font-size: 0.88rem; font-weight: 800; margin-bottom: 7px; color: var(--text); }
+.qtext .qnum { color: var(--beta-p); }
+.qopts { display: flex; flex-direction: column; gap: 5px; }
+.qopt {
+  background: var(--surface2); border: 2px solid var(--border);
+  border-radius: 9px; padding: 9px 13px;
+  font-size: 0.85rem; font-weight: 700; cursor: pointer;
+  text-align: left; font-family: 'Nunito', sans-serif;
+  color: var(--mid); -webkit-tap-highlight-color: transparent;
+}
+.qopt.correct { background: rgba(105,240,174,0.12); border-color: var(--gamma); color: var(--gamma); }
+.qopt.wrong   { background: rgba(239,83,80,0.12);   border-color: var(--magnet-n); color: #ff8a80; }
+.qopt.disabled { pointer-events: none; }
+.qfb { font-size: 0.8rem; margin-top: 5px; padding: 7px 10px; border-radius: 8px; display: none; font-weight: 700; }
+.qfb.show { display: block; }
+.qfb.correct { background: rgba(105,240,174,0.1); color: var(--gamma); border: 1px solid rgba(105,240,174,0.3); }
+.qfb.wrong   { background: rgba(239,83,80,0.1);   color: #ff8a80;      border: 1px solid rgba(239,83,80,0.3); }
+
+/* ── QR ── */
+.qr-section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+  box-shadow: var(--shadow); text-align: center; margin-bottom: 10px;
+}
+.qr-section h3 { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: var(--mid); margin-bottom: 4px; }
+.qr-section p  { font-size: 0.76rem; color: #556; margin-bottom: 12px; }
+#qrcode canvas, #qrcode img { border-radius: 8px; border: 3px solid var(--border); }
+.qr-url { font-family: 'Space Mono', monospace; font-size: 0.62rem; color: var(--mid); word-break: break-all; margin-top: 8px; background: var(--surface2); padding: 7px; border-radius: 8px; }
+
+.footer { text-align: center; font-size: 0.72rem; color: #3a5060; padding: 6px; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+:focus-visible { outline: 2px solid var(--beta-p); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header" role="banner">
+  <div class="header-icon" aria-hidden="true">☢️</div>
+  <div>
+    <h1>Radioaktive Strahlung im Magnetfeld</h1>
+    <p>Lorentzkraft auf α-, β- und γ-Strahlung</p>
+    <span class="badge">Physik · Klasse 9/10 · Kernphysik</span>
+  </div>
+</div>
+
+<!-- Aufgabe -->
+<div class="aufgabe" role="note">
+  🎯 Aufgabe:
+  <span>Wähle eine Strahlungsart und eine Magnetfeldrichtung. Beobachte, wie die Teilchen abgelenkt werden — und erkläre die Ablenkung mit der Lorentzkraft.</span>
+</div>
+
+<!-- Haupt-Layout -->
+<div class="sim-layout">
+
+  <!-- Controls links -->
+  <div class="control-panel" role="region" aria-label="Einstellungen">
+    <div class="cp-title">☢ Strahlungsart</div>
+    <div class="strahlen-grid">
+      <button class="sBtn active-alpha" id="btn-alpha" onclick="setStrahlung('alpha')" aria-pressed="true">
+        α-Strahlung<br><small>He²⁺, +2e</small>
+      </button>
+      <button class="sBtn" id="btn-betap" onclick="setStrahlung('betap')" aria-pressed="false">
+        β⁺-Strahlung<br><small>Positron, +e</small>
+      </button>
+      <button class="sBtn" id="btn-betam" onclick="setStrahlung('betam')" aria-pressed="false">
+        β⁻-Strahlung<br><small>Elektron, −e</small>
+      </button>
+      <button class="sBtn btn-gamma" id="btn-gamma" onclick="setStrahlung('gamma')" aria-pressed="false">
+        γ-Strahlung &nbsp;·&nbsp; <small>Photon, neutral (keine Ablenkung)</small>
+      </button>
+    </div>
+
+    <div class="mag-toggle">
+      <div class="mag-label">🧲 Magnetfeld B</div>
+      <div class="mag-btns">
+        <button class="mBtn active-up" id="mBtn-up"   onclick="setMagnet('up')"   aria-pressed="true">↑ aus<br>Seite</button>
+        <button class="mBtn"           id="mBtn-off"  onclick="setMagnet('off')"  aria-pressed="false">✕ kein<br>Feld</button>
+        <button class="mBtn"           id="mBtn-down" onclick="setMagnet('down')" aria-pressed="false">↓ in<br>Seite</button>
+      </div>
+    </div>
+
+    <div class="info-stack" role="status" aria-live="polite">
+      <div class="info-kachel">
+        <div class="ik-label">Teilchen</div>
+        <div class="ik-wert" id="ik-teilchen">—</div>
+      </div>
+      <div class="info-kachel">
+        <div class="ik-label">Ladung</div>
+        <div class="ik-wert" id="ik-ladung">—</div>
+      </div>
+      <div class="info-kachel">
+        <div class="ik-label">Ablenkung</div>
+        <div class="ik-wert" id="ik-ablenkung">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Canvas rechts -->
+  <div class="canvas-card" role="region" aria-label="Simulationsanzeige">
+    <h3>⚛ Strahlengang im Magnetfeld</h3>
+    <canvas id="sim-canvas" width="680" height="380" aria-label="Simulation der Teilchenbahnen im Magnetfeld"></canvas>
+  </div>
+</div>
+
+<!-- Theorie-Kacheln -->
+<div class="theorie-grid" role="region" aria-label="Hintergrundwissen">
+  <div class="theorie-kachel">
+    <div class="tk-header">
+      <div class="tk-dot" style="background:var(--alpha)"></div>
+      <div class="tk-titel" style="color:var(--alpha)">α-Strahlung (Heliumkern)</div>
+    </div>
+    <div class="tk-text">
+      Ein α-Teilchen besteht aus <strong>2 Protonen + 2 Neutronen</strong> (Heliumkern). Es trägt die Ladung <strong>+2e</strong>. Im Magnetfeld wird es als <strong>positiv geladenes, schweres Teilchen</strong> wenig abgelenkt. Reichweite: nur wenige cm in Luft.
+    </div>
+  </div>
+  <div class="theorie-kachel">
+    <div class="tk-header">
+      <div class="tk-dot" style="background:var(--beta-m)"></div>
+      <div class="tk-titel" style="color:var(--beta-m)">β⁻-Strahlung (Elektron)</div>
+    </div>
+    <div class="tk-text">
+      β⁻-Teilchen sind <strong>Elektronen</strong> mit Ladung <strong>−e</strong>. Sie sind sehr leicht, daher werden sie <strong>stark abgelenkt</strong> — in die entgegengesetzte Richtung zu α-Teilchen. Entstehen bei Neutronenumwandlung: n → p + e⁻ + ν̄.
+    </div>
+  </div>
+  <div class="theorie-kachel">
+    <div class="tk-header">
+      <div class="tk-dot" style="background:var(--beta-p)"></div>
+      <div class="tk-titel" style="color:var(--beta-p)">β⁺-Strahlung (Positron)</div>
+    </div>
+    <div class="tk-text">
+      β⁺-Teilchen sind <strong>Positronen</strong> (Antielektronen) mit Ladung <strong>+e</strong>. Sie werden wie α-Teilchen zur selben Seite abgelenkt, aber <strong>viel stärker</strong> wegen der geringeren Masse.
+    </div>
+  </div>
+  <div class="theorie-kachel">
+    <div class="tk-header">
+      <div class="tk-dot" style="background:var(--gamma)"></div>
+      <div class="tk-titel" style="color:var(--gamma)">γ-Strahlung (Photon)</div>
+    </div>
+    <div class="tk-text">
+      γ-Strahlung ist <strong>elektromagnetische Strahlung</strong> (Photonen). Sie ist <strong>elektrisch neutral</strong> — die Lorentzkraft greift nicht an. Im Magnetfeld <strong>keine Ablenkung</strong>. Höchste Reichweite und Durchdringungsvermögen.
+    </div>
+  </div>
+</div>
+
+<!-- Drei-Finger-Regel -->
+<div class="finger-box" role="region" aria-label="Drei-Finger-Regel">
+  <h3>✋ Drei-Finger-Regel (für positive Ladungen)</h3>
+  <div class="finger-row">
+    <div class="finger-item">
+      <span class="fi-emoji">👍</span>
+      <div class="fi-label fi-daumen">Daumen</div>
+      <div class="fi-text fi-daumen">Bewegungsrichtung<br>des Teilchens (v)</div>
+    </div>
+    <div class="finger-item">
+      <span class="fi-emoji">☝️</span>
+      <div class="fi-label fi-zeige">Zeigefinger</div>
+      <div class="fi-text fi-zeige">Magnetfeldrichtung<br>(B-Feldlinien)</div>
+    </div>
+    <div class="finger-item">
+      <span class="fi-emoji">🖕</span>
+      <div class="fi-label fi-mittel">Mittelfinger</div>
+      <div class="fi-text fi-mittel">Richtung der<br>Lorentzkraft (F<sub>L</sub>)</div>
+    </div>
+  </div>
+  <div style="margin-top:10px; font-size:0.8rem; color:var(--mid); background:var(--surface2); border-radius:8px; padding:8px 10px;">
+    ⚠️ Bei <strong style="color:var(--beta-m)">negativen Ladungen (β⁻)</strong>: Regel anwenden und Richtung <strong>umkehren</strong>.
+  </div>
+</div>
+
+<!-- Quiz -->
+<div class="quiz-section" role="region" aria-label="Quiz">
+  <h3>🧠 Teste dein Wissen</h3>
+
+  <div class="qfrage">
+    <div class="qtext"><span class="qnum">1.</span> Warum wird γ-Strahlung im Magnetfeld nicht abgelenkt?</div>
+    <div class="qopts">
+      <button class="qopt" data-q="1" data-ok="false" onclick="checkQ(this)">Weil Photonen zu schnell sind.</button>
+      <button class="qopt" data-q="1" data-ok="true"  onclick="checkQ(this)">Weil γ-Strahlung elektrisch neutral ist — die Lorentzkraft braucht eine Ladung.</button>
+      <button class="qopt" data-q="1" data-ok="false" onclick="checkQ(this)">Weil das Magnetfeld zu schwach ist.</button>
+    </div>
+    <div class="qfb" id="qfb1"></div>
+  </div>
+
+  <div class="qfrage">
+    <div class="qtext"><span class="qnum">2.</span> α- und β⁺-Teilchen sind beide positiv geladen. Welches wird stärker abgelenkt?</div>
+    <div class="qopts">
+      <button class="qopt" data-q="2" data-ok="false" onclick="checkQ(this)">Das α-Teilchen, weil es mehr Ladung trägt (+2e).</button>
+      <button class="qopt" data-q="2" data-ok="true"  onclick="checkQ(this)">Das β⁺-Teilchen, weil es viel leichter ist (kleiner Radius der Kreisbahn).</button>
+      <button class="qopt" data-q="2" data-ok="false" onclick="checkQ(this)">Beide werden gleich stark abgelenkt.</button>
+    </div>
+    <div class="qfb" id="qfb2"></div>
+  </div>
+
+  <div class="qfrage">
+    <div class="qtext"><span class="qnum">3.</span> Das B-Feld zeigt aus der Seite heraus (↑), ein β⁻-Teilchen fliegt nach rechts. Wohin wird es abgelenkt?</div>
+    <div class="qopts">
+      <button class="qopt" data-q="3" data-ok="false" onclick="checkQ(this)">Nach oben — wie ein positives Teilchen.</button>
+      <button class="qopt" data-q="3" data-ok="true"  onclick="checkQ(this)">Nach unten — weil β⁻ negativ geladen ist, kehrt sich die Kraft um.</button>
+      <button class="qopt" data-q="3" data-ok="false" onclick="checkQ(this)">Gar nicht — Elektronen sind zu klein.</button>
+    </div>
+    <div class="qfb" id="qfb3"></div>
+  </div>
+</div>
+
+<!-- QR-Code -->
+<div class="qr-section" role="region" aria-label="QR-Code">
+  <h3>📱 Simulation öffnen</h3>
+  <p>QR-Code scannen → direkt auf dem iPad</p>
+  <div id="qrcode"></div>
+  <div class="qr-url">https://semmikgs.github.io/mint-simulationen/physik/klasse-910/kernphysik/radioaktivitaet-magnetfeld/simulation.html</div>
+</div>
+
+<div class="footer" role="contentinfo">Physik · Klasse 9/10 · Kernphysik · KGS Schwarmstedt · Herr Semrau</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const state = {
+  strahlung: 'alpha',   // alpha | betap | betam | gamma
+  magnet: 'up',         // up | down | off
+  t: 0                  // Animationszeit
+};
+
+// Physikalische Parameter pro Strahlungsart
+// radius: Kurvenradius der Teilchenbahn (proportional m·v / q·B)
+// alpha: schwer (+2e) → großer Radius (wenig Ablenkung)
+// betap/betam: leicht (e) → kleiner Radius (starke Ablenkung)
+// gamma: neutral → keine Ablenkung
+const STRAHLUNG_DATA = {
+  alpha:  { label: 'α-Teilchen (He²⁺)', ladung: '+2e', farbe: '#ff6b35', radius: 260, speed: 1.2 },
+  betap:  { label: 'β⁺-Teilchen (e⁺)',  ladung: '+e',  farbe: '#4fc3f7', radius: 80,  speed: 2.0 },
+  betam:  { label: 'β⁻-Teilchen (e⁻)',  ladung: '−e',  farbe: '#ab47bc', radius: 80,  speed: 2.0 },
+  gamma:  { label: 'γ-Photon',           ladung: 'neutral (0)', farbe: '#69f0ae', radius: null, speed: 2.5 }
+};
+
+// ═══════════════════════════════════════════
+// CANVAS SETUP
+// ═══════════════════════════════════════════
+const canvas = document.getElementById('sim-canvas');
+const ctx = canvas.getContext('2d');
+const W = 680, H = 380;
+canvas.width = W; canvas.height = H;
+
+// Teilchenspuren für Fade-Effekt
+let trail = [];
+let animId = null;
+
+// ═══════════════════════════════════════════
+// DRAW
+// ═══════════════════════════════════════════
+function draw(t) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Hintergrund
+  ctx.fillStyle = '#0a1520';
+  ctx.fillRect(0, 0, W, H);
+
+  const sd = STRAHLUNG_DATA[state.strahlung];
+  const mag = state.magnet;
+
+  // ── Magnetfeld-Visualisierung (Hintergrund) ──
+  drawMagnetfeld(mag);
+
+  // ── Quelle (Präparat) ──
+  const srcX = 80, srcY = H / 2;
+  drawQuelle(srcX, srcY);
+
+  // ── Detektor-Bereich ──
+  drawDetektor();
+
+  // ── Teilchenbahn ──
+  if (state.strahlung === 'gamma' || mag === 'off') {
+    // Gerade Bahn
+    drawGerade(srcX, srcY, sd.farbe, t, sd.speed);
+    updateInfoGerade(mag);
+  } else {
+    // Kreisbahn (Lorentzkraft)
+    drawKreisbahn(srcX, srcY, sd, mag, t);
+    updateInfoKreis(sd, mag);
+  }
+
+  // ── Legende Magnetfeld ──
+  drawMagLegende(mag);
+}
+
+// Magnetfeld-Punktmuster
+function drawMagnetfeld(mag) {
+  if (mag === 'off') return;
+  const spacing = 40;
+  ctx.save();
+  for (let x = 120; x < W - 20; x += spacing) {
+    for (let y = 30; y < H - 20; y += spacing) {
+      if (mag === 'up') {
+        // Punkte (aus Seite heraus: ⊙)
+        ctx.fillStyle = 'rgba(239,83,80,0.18)';
+        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = 'rgba(239,83,80,0.5)';
+        ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2); ctx.fill();
+      } else {
+        // Kreuz (in Seite hinein: ⊗)
+        ctx.strokeStyle = 'rgba(66,165,245,0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x-5, y-5); ctx.lineTo(x+5, y+5);
+        ctx.moveTo(x+5, y-5); ctx.lineTo(x-5, y+5);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+}
+
+// Quelle
+function drawQuelle(x, y) {
+  // Kollimator (Bleiblock mit Kanal)
+  ctx.fillStyle = '#2a3a4a';
+  ctx.fillRect(x - 22, y - 35, 20, 28);
+  ctx.fillRect(x - 22, y + 7,  20, 28);
+  // Öffnung (Kanal)
+  ctx.fillStyle = '#0a1520';
+  ctx.fillRect(x - 22, y - 7, 20, 14);
+  // Präparat-Dot
+  const grad = ctx.createRadialGradient(x-22, y, 0, x-22, y, 14);
+  grad.addColorStop(0, 'rgba(255,200,50,0.9)');
+  grad.addColorStop(1, 'rgba(255,100,0,0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath(); ctx.arc(x-22, y, 14, 0, Math.PI*2); ctx.fill();
+  // Label
+  ctx.fillStyle = '#7a9ab8';
+  ctx.font = 'bold 10px Nunito, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Präparat', x - 12, y + 50);
+  ctx.fillText('+ Kollimator', x - 12, y + 62);
+}
+
+// Detektor
+function drawDetektor() {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(105,240,174,0.3)';
+  ctx.setLineDash([4, 4]);
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(W - 40, 20); ctx.lineTo(W - 40, H - 20); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(105,240,174,0.15)';
+  ctx.fillRect(W - 40, 20, 30, H - 40);
+  ctx.fillStyle = '#69f0ae';
+  ctx.font = 'bold 10px Nunito, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.save(); ctx.translate(W - 25, H/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('DETEKTOR', 0, 0); ctx.restore();
+  ctx.restore();
+}
+
+// Gerade Bahn (gamma oder kein Feld)
+function drawGerade(srcX, srcY, farbe, t, speed) {
+  const endX = W - 50;
+  const progress = ((t * speed * 0.012) % 1.2);
+  const px = srcX + (endX - srcX) * Math.min(progress, 1);
+
+  // Spur
+  ctx.save();
+  const grad = ctx.createLinearGradient(srcX, srcY, px, srcY);
+  grad.addColorStop(0, 'rgba(105,240,174,0.0)');
+  grad.addColorStop(0.3, farbe + 'aa');
+  grad.addColorStop(1, farbe);
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(srcX, srcY); ctx.lineTo(px, srcY); ctx.stroke();
+
+  // Teilchen-Punkt
+  if (progress <= 1) {
+    ctx.shadowBlur = 12; ctx.shadowColor = farbe;
+    ctx.fillStyle = farbe;
+    ctx.beginPath(); ctx.arc(px, srcY, 5, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+  ctx.restore();
+
+  // Hinweis bei gamma
+  if (state.strahlung === 'gamma') {
+    ctx.fillStyle = '#69f0ae';
+    ctx.font = 'bold 12px Nunito, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Keine Ablenkung — γ ist elektrisch neutral', W/2, H/2 - 22);
+  }
+  if (state.magnet === 'off') {
+    ctx.fillStyle = '#7a9ab8';
+    ctx.font = 'bold 11px Nunito, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Kein Magnetfeld → keine Lorentzkraft → gerade Bahn', W/2, H/2 - 22);
+  }
+}
+
+// Kreisbahn (Lorentzkraft)
+function drawKreisbahn(srcX, srcY, sd, mag, t) {
+  const r = sd.radius;
+  const isPositive = (sd.ladung.includes('+'));
+  // Ablenkungsrichtung:
+  // B aus Seite (up), positive Ladung, Bewegung nach rechts → Kraft nach OBEN (−y)
+  // B aus Seite (up), negative Ladung → Kraft nach UNTEN (+y)
+  // B in Seite (down) → umgekehrt
+  let upward;
+  if (mag === 'up')   upward = isPositive ? true  : false;
+  if (mag === 'down') upward = isPositive ? false : true;
+
+  // Mittelpunkt des Kreises
+  const cx = srcX;
+  const cy = upward ? srcY - r : srcY + r;
+
+  // Startwinkel: Teilchen kommt von links, bewegt sich nach rechts
+  // Auf dem Kreis: srcX, srcY → Winkel vom Mittelpunkt
+  const startAngle = upward ? Math.PI/2 : -Math.PI/2;  // unten/oben vom Mittelpunkt
+  const dir = upward ? -1 : 1; // Drehrichtung
+
+  // Maximaler Winkel (Sichtbarkeit)
+  const maxAngle = Math.PI * 0.85;
+  const progress = Math.min(((t * sd.speed * 0.008) % 1.4), 1);
+  const currentAngle = progress * maxAngle;
+
+  // Spur zeichnen
+  ctx.save();
+  ctx.lineWidth = 2.8;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, startAngle, startAngle + dir * currentAngle, dir < 0);
+  const gradSpur = ctx.createLinearGradient(srcX, srcY, srcX + r, srcY - (upward ? r : -r) * 0.5);
+  gradSpur.addColorStop(0, sd.farbe + '33');
+  gradSpur.addColorStop(0.5, sd.farbe + 'aa');
+  gradSpur.addColorStop(1, sd.farbe);
+  ctx.strokeStyle = gradSpur;
+  ctx.stroke();
+
+  // Teilchen-Punkt an aktueller Position
+  const angle = startAngle + dir * currentAngle;
+  const px = cx + r * Math.cos(angle);
+  const py = cy + r * Math.sin(angle);
+
+  ctx.shadowBlur = 14; ctx.shadowColor = sd.farbe;
+  ctx.fillStyle = sd.farbe;
+  ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Teilchen-Label
+  ctx.fillStyle = sd.farbe;
+  ctx.font = 'bold 11px Nunito, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText(state.strahlung === 'alpha' ? 'α' : state.strahlung === 'betap' ? 'β⁺' : 'β⁻',
+               px + 8, py - 6);
+
+  // Kraft-Pfeil
+  if (progress > 0.05 && progress < 0.9) {
+    const vx = -Math.sin(angle) * dir;
+    const vy =  Math.cos(angle) * dir;
+    const fx = upward ? -vy : vy;
+    const fy = upward ? vx : -vx;
+    drawArrow(ctx, px, py, px + fx * 30, py + fy * 30, '#ffd54f', 'F_L');
+  }
+  ctx.restore();
+
+  // Ablenkungshinweis
+  const richtung = upward ? '↑ nach oben' : '↓ nach unten';
+  ctx.fillStyle = sd.farbe;
+  ctx.font = 'bold 12px Nunito, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(`Lorentzkraft → Ablenkung ${richtung}`, W/2, 22);
+}
+
+function drawArrow(ctx, x1, y1, x2, y2, color, label) {
+  const angle = Math.atan2(y2-y1, x2-x1);
+  ctx.save();
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+  ctx.translate(x2, y2); ctx.rotate(angle);
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-10,-5); ctx.lineTo(-10,5); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  if (label) {
+    ctx.fillStyle = color;
+    ctx.font = 'bold 10px Nunito';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, x2 + 12, y2 - 6);
+  }
+}
+
+// Magnetfeld-Legende
+function drawMagLegende(mag) {
+  const lx = 125, ly = H - 30;
+  ctx.fillStyle = '#7a9ab8';
+  ctx.font = 'bold 11px Nunito, sans-serif';
+  ctx.textAlign = 'left';
+  if (mag === 'up') {
+    ctx.fillStyle = '#ef5350';
+    ctx.fillText('B-Feld: ⊙ aus der Seite heraus (↑)', lx, ly);
+  } else if (mag === 'down') {
+    ctx.fillStyle = '#42a5f5';
+    ctx.fillText('B-Feld: ⊗ in die Seite hinein (↓)', lx, ly);
+  } else {
+    ctx.fillStyle = '#556';
+    ctx.fillText('Kein Magnetfeld', lx, ly);
+  }
+}
+
+// ── Info-Kacheln updaten ──
+function updateInfoGerade(mag) {
+  const sd = STRAHLUNG_DATA[state.strahlung];
+  document.getElementById('ik-teilchen').textContent  = sd.label;
+  document.getElementById('ik-teilchen').className    = 'ik-wert ik-' + (state.strahlung === 'gamma' ? 'gamma' : state.strahlung === 'alpha' ? 'alpha' : state.strahlung === 'betap' ? 'betap' : 'betam');
+  document.getElementById('ik-ladung').textContent    = sd.ladung;
+  document.getElementById('ik-ablenkung').textContent = state.strahlung === 'gamma' ? 'keine (neutral)' : 'keine (kein Feld)';
+  document.getElementById('ik-ablenkung').className   = 'ik-wert ik-neutral';
+}
+
+function updateInfoKreis(sd, mag) {
+  const isPositive = sd.ladung.includes('+');
+  let upward;
+  if (mag === 'up')   upward = isPositive;
+  if (mag === 'down') upward = !isPositive;
+  const richtung = upward ? '↑ nach oben' : '↓ nach unten';
+
+  document.getElementById('ik-teilchen').textContent  = sd.label;
+  document.getElementById('ik-teilchen').className    = 'ik-wert ik-' + (state.strahlung === 'alpha' ? 'alpha' : state.strahlung === 'betap' ? 'betap' : 'betam');
+  document.getElementById('ik-ladung').textContent    = sd.ladung;
+  document.getElementById('ik-ablenkung').textContent = richtung;
+  document.getElementById('ik-ablenkung').className   = 'ik-wert ' + (upward ? 'ik-betap' : 'ik-betam');
+}
+
+// ═══════════════════════════════════════════
+// ANIMATION LOOP
+// ═══════════════════════════════════════════
+let lastTime = 0;
+function loop(ts) {
+  const dt = ts - lastTime; lastTime = ts;
+  state.t += dt;
+  draw(state.t);
+  animId = requestAnimationFrame(loop);
+}
+animId = requestAnimationFrame(loop);
+
+// ═══════════════════════════════════════════
+// BUTTONS
+// ═══════════════════════════════════════════
+function setStrahlung(typ) {
+  state.strahlung = typ;
+  state.t = 0;
+  ['alpha','betap','betam','gamma'].forEach(s => {
+    const b = document.getElementById('btn-' + s);
+    b.className = 'sBtn' + (s === typ ? ' active-' + s : '');
+    b.setAttribute('aria-pressed', s === typ ? 'true' : 'false');
+  });
+}
+
+function setMagnet(dir) {
+  state.magnet = dir;
+  state.t = 0;
+  ['up','off','down'].forEach(d => {
+    const b = document.getElementById('mBtn-' + d);
+    b.className = 'mBtn' + (d === dir ? ' active-' + dir : '');
+    b.setAttribute('aria-pressed', d === dir ? 'true' : 'false');
+  });
+}
+
+// ═══════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════
+const QFB = {
+  1: { c: '✅ Richtig! Die Lorentzkraft F = q·(v×B) wirkt nur auf Ladungen — γ-Photonen haben q = 0.', w: '❌ Falsch. Geschwindigkeit ist nicht der Grund. γ-Strahlung ist elektrisch neutral.' },
+  2: { c: '✅ Richtig! Der Kreisbahnradius r = m·v/(q·B) ist für das leichtere β⁺ viel kleiner → stärkere Krümmung.', w: '❌ Nicht ganz. Obwohl α die doppelte Ladung hat, ist seine Masse ~8000× größer als die des Positrons.' },
+  3: { c: '✅ Richtig! Drei-Finger-Regel für positive Ladung: Daumen rechts, Zeigefinger raus → Mittelfinger oben. β⁻ → Umkehrung → nach unten.', w: '❌ Falsch. Für β⁻ muss die Drei-Finger-Regel-Richtung umgekehrt werden — negative Ladung.' }
+};
+const answered = {};
+function checkQ(btn) {
+  const q = btn.dataset.q;
+  if (answered[q]) return;
+  answered[q] = true;
+  document.querySelectorAll(`[data-q="${q}"]`).forEach(b => b.classList.add('disabled'));
+  const ok = btn.dataset.ok === 'true';
+  btn.classList.add(ok ? 'correct' : 'wrong');
+  if (!ok) document.querySelectorAll(`[data-q="${q}"][data-ok="true"]`).forEach(b => b.classList.add('correct'));
+  const fb = document.getElementById('qfb' + q);
+  fb.textContent = ok ? QFB[q].c : QFB[q].w;
+  fb.className = 'qfb show ' + (ok ? 'correct' : 'wrong');
+}
+
+// ═══════════════════════════════════════════
+// QR-CODE
+// ═══════════════════════════════════════════
+window.addEventListener('load', () => {
+  new QRCode(document.getElementById('qrcode'), {
+    text: 'https://semmikgs.github.io/mint-simulationen/physik/klasse-910/kernphysik/radioaktivitaet-magnetfeld/simulation.html',
+    width: 160, height: 160,
+    colorDark: '#4fc3f7', colorLight: '#0f1923',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+});
+</script>
+</body>
+</html>
